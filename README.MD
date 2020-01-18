@@ -71,14 +71,14 @@ syslog messages in the RFC3164 format. Note: Devices on the network, not PC's or
 
 > This is a static library, built to be used in the Windows client or server.
 
-> Built with Microsoft (R) C/C++ Optimizing Compiler Version 19.15.26732.1 or better.
-> (In 2020Q1, standard C++ was C++17)
+Built with Microsoft (R) C/C++ Optimizing Compiler Version 19.15.26732.1 or better.
+(In 2020Q1, standard C++ was C++17)
 
 
 
 > Copyright by dbj@dbj.org, serverside.systems, a division of dbj.systems ltd.
 
-> Licence is [here](./LICENSE.MD).
+Licence is [here](LICENSE.md).
 
 ---------------------------------------------------------------------  
 
