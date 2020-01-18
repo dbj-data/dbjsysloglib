@@ -1,14 +1,19 @@
 
 # dbjsysloglib 
-### standard C implementation
 
-(For good and mature syslog server please check: https://www.paessler.com/free_syslog_server )
+Standard C implementation
+
+![](./media/syslogwatcher.com.jpg)
+
+For our Windows server side deliverables we use "[SysLog Watcher](https://syslogwatcher.com/)".
+
+(For another good and mature syslog server please check: https://www.paessler.com/free_syslog_server )
 
 The project we started from is Copyright (c) 2008 Secure Endpoints Inc.
 
 
 > ## Disclaimer: <br/>
-> #### This is Open Source Proof Of Concept (POC). <br/>
+> #### This is Free Open Source code. <br/>
 > #### Use at your own risk. We do.
 
 
