@@ -1,7 +1,13 @@
 #pragma once
 #ifndef DBJ_SYSLOG_LIB_INC
 #define DBJ_SYSLOG_LIB_INC
+/*
+ADVISORY:
 
+When building with clang in release mode switch the /LTCG option off, see bellow:
+
+https://github.com/MicrosoftDocs/cpp-docs/issues/376
+*/
 /*
 public header of the dbjsysloglib
 */

@@ -362,23 +362,23 @@ void vsyslog( int pri, const char * message_ )
 		local_hostname, syslog_ident, syslog_procid_str);
 */
 	/* dbj comment: this does clean them all into spaces */
-	while (p = strchr(datagramm, '\n')) {
+	while ((p = strchr(datagramm, '\n'))) {
 		if (p)
 			*p = ' '; /* 0; dbj replaced 0 with space */
 	}
-	while (p = strchr(datagramm, '\t')) {
+	while ((p = strchr(datagramm, '\t'))) {
 		if (p)
 			*p = ' '; /* 0; dbj replaced 0 with space */
 	}
-	while (p = strchr(datagramm, '\r')) {
+	while ((p = strchr(datagramm, '\r'))) {
 		if (p)
 			*p = ' '; /* 0; dbj replaced 0 with space */
 	}
-	while (p = strchr(datagramm, '\v')) {
+	while ((p = strchr(datagramm, '\v'))) {
 		if (p)
 			*p = ' '; /* 0; dbj replaced 0 with space */
 	}
-	while (p = strchr(datagramm, '\f')) {
+	while ((p = strchr(datagramm, '\f'))) {
 		if (p)
 			*p = ' '; /* 0; dbj replaced 0 with space */
 	}
