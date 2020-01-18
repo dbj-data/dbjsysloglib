@@ -1,15 +1,15 @@
 #pragma once
 #ifndef DBJ_SYSLOG_LIB_INC
 #define DBJ_SYSLOG_LIB_INC
+
 /*
-ADVISORY:
-
-When building with clang in release mode switch the /LTCG option off, see bellow:
-
-https://github.com/MicrosoftDocs/cpp-docs/issues/376
+(c) 2019/2020 by dbj.systems, author: dbj@dbj.org
+public header for the C code using the dbjsysloglib
 */
 /*
-public header of the dbjsysloglib
+ADVISORY:
+When building with clang in release mode switch the /LTCG option off, see :
+https://github.com/MicrosoftDocs/cpp-docs/issues/376
 */
 
 #ifdef __cplusplus
@@ -17,6 +17,12 @@ namespace dbj::syslog {
 extern "C" {
 #endif
 
+	// SEMantic VERsioning
+	typedef enum version {
+	 MAJOR = 1,
+	 MINOR = 0,
+	 PATCH = 0,
+	} version;
 	// must iniialize before first use
 	// WARNING! if not initialized dbjsysloglob will simply exit
 	extern int is_syslog_initialized();

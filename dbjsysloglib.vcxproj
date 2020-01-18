@@ -23,6 +23,7 @@
     <ClCompile Include="syslog\syslogc.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dbj++log.h" />
     <ClInclude Include="dbjsyslog.h" />
     <ClInclude Include="syslog\syslog.h" />
   </ItemGroup>
