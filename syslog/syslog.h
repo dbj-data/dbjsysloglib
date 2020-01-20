@@ -41,7 +41,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+    /* syslog default is 64KB */
+#define SYSLOG_DGRAM_SIZE (1024 * 4)
 /*
  * priorities/facilities are encoded into a single 32-bit quantity, where the
  * bottom 3 bits are the priority (0-7) and the top 28 bits are the facility
@@ -193,7 +194,7 @@ extern void vsyslog (int /*__pri*/, const char * /* __fmt */, va_list );
     /* 
        init_syslog() *must* be called before calling any of the above
        functions.  exit_syslog() will be scheduled using atexit().
-       However, it is not an error and encouraged to call
+       However, it is not an error and is encouraged to call
        exit_syslog() before the application exits.
 
        During operation, the application is free to call exit_syslog()

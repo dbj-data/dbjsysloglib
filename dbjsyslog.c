@@ -40,6 +40,12 @@ static const char* app_base_name()
 
 extern void   dbj_syslog_initalize(const char*  ip_and_port  , const char* id )
 {
+    /*
+    WARNING: HACK AHEAD ! --   We allow here for repeated initialization
+    */
+    if (is_syslog_initialized()) {
+        exit_syslog();
+    }
     // if ip_and_port == NULL, localhost is used
     init_syslog(ip_and_port);
     // if id == NULL then id = "Anonymous" which is not good

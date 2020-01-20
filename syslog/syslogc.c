@@ -42,8 +42,6 @@
 #define SYSLOG_NAMES
 #include "syslog.h"
 
-#define SYSLOG_DGRAM_SIZE 1024
-
 // dbj added
 static const char* month[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
