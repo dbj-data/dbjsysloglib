@@ -188,8 +188,7 @@ extern int setlogmask (int __mask);
 /* Generate a log message using FMT string and option arguments.  */
 extern void syslog (int __pri, const char *__fmt, ...);
 
-/* send the log message  by the priority given */
-extern void vsyslog (int, const char * );
+extern void vsyslog (int /*__pri*/, const char * /* __fmt */, va_list );
 
     /* 
        init_syslog() *must* be called before calling any of the above

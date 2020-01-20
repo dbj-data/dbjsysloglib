@@ -2,10 +2,6 @@
 #include "dbjsyslog.h"
 #include "syslog/syslog.h"
 
-#ifndef _CRT_DECLARE_GLOBAL_VARIABLES_DIRECTLY
-/*  _CRT_DECLARE_GLOBAL_VARIABLES_DIRECTLY must be defined for app_base_name() to work */
-#define  _CRT_DECLARE_GLOBAL_VARIABLES_DIRECTLY
-#endif 
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -53,16 +49,12 @@ extern void   dbj_syslog_initalize(const char*  ip_and_port  , const char* id )
         openlog(id, LOG_ODELAY, LOG_USER);
 }
 
-static void   syslog_call(int level_, const char* format_, ... )
+static void   syslog_call(int level_, const char* format_, va_list ap)
 {
     if (!is_syslog_initialized()) {
         dbj_syslog_initalize( NULL, NULL);
     }
-
-    va_list ap;
-    va_start(ap, format_);
-        syslog(level_, format_, ap);
-    va_end(ap);
+        vsyslog(level_, format_, ap);
 }
 /*
 to uninitialize means to call closelog() and do some othe cleanup

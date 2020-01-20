@@ -44,6 +44,10 @@
 
 #define SYSLOG_DGRAM_SIZE 1024
 
+// dbj added
+static const char* month[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
 static BOOL        syslog_opened = FALSE;
 
 static int         syslog_mask = 0xFF;
@@ -306,25 +310,41 @@ void syslog( int pri, const char *fmt, ... )
 
 	va_list ap;
 	va_start( ap, fmt );
-	if (1 < vsprintf_s(message_, sizeof(message_), fmt, ap))
-	{
-		perror("vsprintf_s() failed?\n\n" __FILE__ );
-		exit(1);
-	}
+    vsyslog( pri, fmt, ap );
 	va_end(ap);
-
-    vsyslog( pri, message_ );
 }
 
+void syslog_send(int pri, const char* message_);
+
+void vsyslog(int pri, const char* fmt, va_list ap)
+{
+    if (!initialized) /* dbj added */
+    {
+        perror("Warning: dbj syslog not initialized?");
+        return;
+    }
+
+    // Caution! the message must be smaller than SYSLOG_DGRAM_SIZE
+    char  message_[SYSLOG_DGRAM_SIZE] = { 0 };
+
+    // va_start(ap, fmt);
+    // or -- https://linux.die.net/man/3/vsnprintf
+    if ( vsprintf_s(message_, sizeof(message_), fmt, ap) < 0 )
+    {
+        perror("vsprintf_s() failed?\n\n" __FILE__);
+        exit(1);
+    }
+    // va_end(ap);
+
+    syslog_send(pri, message_);
+}
 /******************************************************************************
- * vsyslog
  *
  * Generate a log message using FMT and using arguments pointed to by AP.
  */
-void vsyslog( int pri, const char * message_ )
+static void syslog_send( int pri, const char * message_ )
 {
-    static char *month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
     char  datagramm[ SYSLOG_DGRAM_SIZE ];
     SYSTEMTIME stm;
     int len;

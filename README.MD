@@ -22,11 +22,28 @@ Currently [RFC3164](https://tools.ietf.org/html/rfc3164) is followed. Plan is to
 
 ### Usage and the API
 
-Loging and syslog are cool and best way to develop resilient software.
+Before any usage syslog connection must be initialized.
 
+```cpp
+// declaration
+extern void   dbj_syslog_initalize(const char*  ip_and_port  , const char* id );
+
+'''
+
+//usage
+// syslog server is at localhost:514
+// "tag" is "my tag" 
+dbj_syslog_initalize( nullptr , "my tag");
+```
+"host" will be local machine name
+"facility" will be "user"
+PID aka process id will be added to the tag. Thus above tag will appear as
+`my tag[pid:10848]` for example.
+
+Loging and syslog are cool and best way to develop resilient software.
 But be carefull not to introduce too much hard-wired dependancies by using the dbjsysloglib (syslog).
 
-We recomend using the set of macros found at the botom of the `dbjsyslog.h`,  in order to 
+We recomend using the set of macros found at the botom of the `dbj++log.h`,  in order to 
 decouple a bit more.
 
 ```cpp
@@ -48,8 +65,23 @@ decouple a bit more.
 #define DBJ_LOG_NTC(...)
 ```
 
+Keep in mind these macros ara available only to C++ code. They are also using local inline functions that provide mutex locking to each of them.
+These macros are calling C API functions declared in `dbjsyslog.h`
+```cpp
+/* dbjsyslog.h, C API */
+extern void  syslog_emergency(const char* format_, ...);
+extern void  syslog_alert(const char* format_, ...);
+extern void  syslog_critical(const char* format_, ...);
+extern void  syslog_error(const char* format_, ...);
+extern void  syslog_warning(const char* format_, ...);
+extern void  syslog_notice(const char* format_, ...);
+extern void  syslog_info(const char* format_, ...);
+extern void  syslog_debug(const char* format_, ...);
+```
+Currently implementations of these functions are not resilient in presence of threads.
+
 Use these macros. They are active if DBJ_SYSLOGLIB is defined before 
-including `dbjsyslog.h`, if not they are `__noop`.
+including `dbj++log.h`, if not they are `__noop`.
 
 <span id="features">
 
