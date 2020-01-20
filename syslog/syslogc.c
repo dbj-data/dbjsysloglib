@@ -367,10 +367,10 @@ static void syslog_send( int pri, const char * message_ )
 
 /* THIS IS https://tools.ietf.org/html/rfc3164 FORMAT */
 	len = sprintf_s( datagramm, sizeof(datagramm),
-                     "<%d>%s %2d %02d:%02d:%02d %s %s%s: %s",
+                     "<%d>%s %2d %02d:%02d:%02d %s %s %s: %s",
                      pri,
                      month[ stm.wMonth - 1 ], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond,
-                     local_hostname, syslog_ident, syslog_procid_str, message_ );
+                     local_hostname, syslog_procid_str, syslog_ident,  message_ );
 /* RFC5424 format */
 /*
 	len = sprintf_s(datagramm, sizeof(datagramm),
