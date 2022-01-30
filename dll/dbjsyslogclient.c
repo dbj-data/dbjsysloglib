@@ -7,13 +7,11 @@ basically in here we connect interface implementation with actual implementation
 
 #include "dbjsyslogclient.h"
 
-#include <string.h>
-
-#include "dbj-component.h"
+#include "dbj-dllimp.h"
 #include "src/dbjsyslog.h"  // the implementation
 
 // max len is 0xFF - 1
-#define DBJ_DLL_CAPTION "dbj syslog client"
+// #define DBJ_DLL_CAPTION "dbj syslog client"
 
 #define DBJ_COMPONENT_VERSION_IMPLEMENTATION_(MA_, MI_, PA_, S_)                  \
   struct dbj_component_version_ dbj_component_version_(void) {                    \
