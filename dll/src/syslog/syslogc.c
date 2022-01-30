@@ -304,7 +304,7 @@ void syslog( int pri, const char *fmt, ... )
     }
 
 	// Caution! the message must be smaller than SYSLOG_DGRAM_SIZE
-	char  message_[SYSLOG_DGRAM_SIZE] = {0};
+	// char  message_[SYSLOG_DGRAM_SIZE] = {0};
 
 	va_list ap;
 	va_start( ap, fmt );

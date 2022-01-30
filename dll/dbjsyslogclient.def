@@ -1,0 +1,4 @@
+EXPORTS
+dbj_component_can_unload_now    PRIVATE
+interface_factory               PRIVATE
+dbj_component_version           PRIVATE
