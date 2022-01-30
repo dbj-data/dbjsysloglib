@@ -28,9 +28,6 @@ namespace dbj::syslog {
 	 int is_syslog_initialized();
 	/* to initialize in this context means
 	   call init_syslog( ip_and_port = localhost ) 
-	   
-	   and then 
-
 	   openlog( id, option, facility );
 
 	   if id == NULL it will be "Anonymous"

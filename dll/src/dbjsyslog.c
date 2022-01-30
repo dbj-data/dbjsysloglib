@@ -7,6 +7,38 @@
 #include <string.h>
 #include <stdarg.h>
 
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <shellapi.h>
+#include <crtdbg.h>
+
+static inline 
+char** __cdecl dbjwin_command_line_to_utf8_argv(int* o_argc) {
+  int argc_ = 0;
+  char** argv = 0;
+  char* args = 0;
+
+  LPWSTR* w_argv = CommandLineToArgvW(GetCommandLineW(), &argc_);
+  _ASSERTE(w_argv != NULL);
+
+  size_t size = wcslen(GetCommandLineW()) * 4;
+  argv = (char**)calloc(1, (argc_ + 1) * sizeof(char*) + size);
+  args = (char*)&argv[argc_ + 1];
+  int n;
+  for (int i = 0; i < argc_; ++i) {
+    n = WideCharToMultiByte(CP_UTF8, 0, w_argv[i], -1, args, (int)size, NULL,
+                            NULL);
+    _ASSERTE(n != 0);
+    argv[i] = args;
+    size -= n;
+    args += n;
+  }
+  LocalFree(w_argv);
+
+*o_argc = argc_;
+    return argv;
+}
+
 /* note: this includes suffix in a result */
 static char* basename(const char* full_path)
 {
@@ -20,10 +52,8 @@ static char* basename(const char* full_path)
 
 static const char* app_base_name() 
 {
-    assert(__argv);
-    assert(__argv[0]);
-
-       return basename(__argv[0]) ;
+  int argc_ = 0;
+  return basename(dbjwin_command_line_to_utf8_argv(&argc_)[0]);
 }
 
 /* to initialize in this context means
@@ -38,10 +68,10 @@ static const char* app_base_name()
    for details
 */
 
-extern void   dbj_syslog_initalize(const char*  ip_and_port  , const char* id )
+void   dbj_syslog_initalize(const char*  ip_and_port  , const char* id )
 {
     /*
-    WARNING: HACK AHEAD ! --   We allow here for repeated initialization
+    WARNING: HACK AHEAD ! --   We do this for repeated initialization
     */
     if (is_syslog_initialized()) {
         exit_syslog();

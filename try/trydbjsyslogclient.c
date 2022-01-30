@@ -38,7 +38,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   dbjsyslog_client* iface_ = dll_factory_();
   assert(iface_);
   // 3. call the methods available
-  iface_->dbj_syslog_initalize(0, "PRIME");
+  iface_->dbj_syslog_initalize(0, 0);
 
   iface_->emergency("%s", "Emergency!");
   iface_->alert("%s", "Alert!");
