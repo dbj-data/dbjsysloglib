@@ -67,10 +67,10 @@ struct dbjsyslog_client_ {
 //
 //  HINSTANCE dll_hinst_ = dbj_dll_load(DBJSYSLOGCLIENT_DLL_NAME);
 //
-// dbj_dll_get_function returns void *, thus the cast is necessary
+// dbj_dll_get_factory_function returns void *, thus the cast is necessary
 //
 //  dbjsyslog_client_ifp dll_factory_ =
-//  (dbjsyslog_client_ifp)dbj_dll_get_function(
+//  (dbjsyslog_client_ifp)dbj_dll_get_factory_function(
 //    &dll_hinst_, DBJCS_INTEFACE_FACTORY_STR);
 //
 //   dbjsyslog_client* iface_ = dll_factory_();

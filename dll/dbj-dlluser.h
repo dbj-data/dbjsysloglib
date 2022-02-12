@@ -54,7 +54,7 @@ static inline HINSTANCE dbj_dll_load(
 one is hoping OS is caching the dll + function, in memory for the next call;
 returns null on error
 */
-static inline void *dbj_dll_get_function(HINSTANCE *dll_handle_, char const fun_name_[static 1])
+static inline void *dbj_dll_get_factory_function(HINSTANCE *dll_handle_, char const fun_name_[static 1])
 {
     // Funny fact: GetProcAddress has no unicode equivalent
     FARPROC result =
@@ -67,11 +67,11 @@ static inline void *dbj_dll_get_function(HINSTANCE *dll_handle_, char const fun_
 }
 
 // returns EINVAL on erro, 0 on OK
-static inline int dbj_light_version_report(HINSTANCE dll_handle_, const unsigned name_len, const char dll_name[const static name_len])
+static inline int dbj_dll_version_report(HINSTANCE dll_handle_, const unsigned name_len, const char dll_name[const static name_len])
 {
     // using the version info is exactly the same for every DBJ Component
     DBJ_COMPONENT_SEMVER_FP get_version =
-        (DBJ_COMPONENT_SEMVER_FP)dbj_dll_get_function(
+        (DBJ_COMPONENT_SEMVER_FP)dbj_dll_get_factory_function(
             &dll_handle_, DBJCS_COMPONENT_VERSION_STR);
 
     if (!get_version)
@@ -94,7 +94,7 @@ static inline int dbj_light_unload_dll(HINSTANCE dll_handle_, const unsigned nam
 {
     // unloading is also exactly the same for every DBJ Component
     DBJ_COMPONENT_UNLOAD_FP can_unload =
-        (DBJ_COMPONENT_UNLOAD_FP)dbj_dll_get_function(&dll_handle_,
+        (DBJ_COMPONENT_UNLOAD_FP)dbj_dll_get_factory_function(&dll_handle_,
                                                       DBJCS_CAN_UNLOAD_NOW_STR);
     if (!can_unload)
     {
@@ -124,7 +124,7 @@ obtain the pointer to the interface factory, example:
 
 */
 #define DBJ_DLL_IFP(FP_, N_, DLLHANDLE_) \
-  FP_ N_ = (FP_)dbj_dll_get_function(&DLLHANDLE_, DBJCS_INTEFACE_FACTORY_STR)
+  FP_ N_ = (FP_)dbj_dll_get_factory_function(&DLLHANDLE_, DBJCS_INTEFACE_FACTORY_STR)
 
 /*
  

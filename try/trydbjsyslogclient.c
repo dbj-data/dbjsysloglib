@@ -19,7 +19,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   // first report on the dbj dll used
   if (dll_hinst_)
-    dbj_light_version_report(dll_hinst_, sizeof(DBJSYSLOGCLIENT_DLL_NAME),
+    dbj_dll_version_report(dll_hinst_, sizeof(DBJSYSLOGCLIENT_DLL_NAME),
                              DBJSYSLOGCLIENT_DLL_NAME);
   else
     return EXIT_FAILURE;
@@ -30,7 +30,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   // now onto the normal usage
   // 1. obtain the factory function
   dbjsyslog_client_ifp dll_factory_ =
-      (dbjsyslog_client_ifp)dbj_dll_get_function(&dll_hinst_,
+      (dbjsyslog_client_ifp)dbj_dll_get_factory_function(&dll_hinst_,
                                                  DBJCS_INTEFACE_FACTORY_STR);
 
   assert(dll_factory_);
@@ -61,7 +61,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
        static dbjsyslog_client* iface_ = 0;
        if (! iface_ ) {
          dbjsyslog_client_ifp dll_factory_ =
-         (dbjsyslog_client_ifp)dbj_dll_get_function(&dll_hinst_, DBJCS_INTEFACE_FACTORY_STR);
+         (dbjsyslog_client_ifp)dbj_dll_get_factory_function(&dll_hinst_, DBJCS_INTEFACE_FACTORY_STR);
           assert(dll_factory_); 
           if (dll_factory_) {
           iface_ = dll_factory_();
