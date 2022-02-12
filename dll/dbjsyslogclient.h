@@ -14,6 +14,8 @@
 
 #pragma clang system_header
 
+#include "dbj_syslog_wall_of_macros.h"
+
 #ifdef _cplusplus
 extern "C" {
 #endif
