@@ -5,31 +5,31 @@
 basically in here we connect interface implementation with actual implementation
 */
 
-#include "dbjsyslogclient.h"
-
-#include "dbj-dllimp.h"
+#include "dbjsyslogclient.h" // public component header for users
 #include "src/dbjsyslog.h"  // the implementation
+
+#include <dbj-dll/dbj-dllimp.h>
+
 
 // max len is 0xFF - 1
 // #define DBJ_DLL_CAPTION "dbj syslog client"
 
-#define DBJ_COMPONENT_VERSION_IMPLEMENTATION_(MA_, MI_, PA_, S_)                  \
-  struct dbj_component_version_ dbj_component_version_(void) {                    \
-    static struct dbj_component_version_ the_version_ = {MA_, MI_, PA_, {0}};     \
-    if (0 == &the_version_.description[0]) {                                      \
-      static_assert(caption_size < sizeof(the_version_.description));             \
-      memcpy(the_version_.description, caption, sizeof(the_version_.description); \
-    }                                                                             \
-    return the_version_;                                                          \
-  }
+//#define DBJ_COMPONENT_VERSION_IMPLEMENTATION_(MA_, MI_, PA_, S_)                  \
+//  struct dbj_component_version_ dbj_component_version_(void) {                    \
+//    static struct dbj_component_version_ the_version_ = {MA_, MI_, PA_, {0}};     \
+//    if (0 == &the_version_.description[0]) {                                      \
+//      static_assert(caption_size < sizeof(the_version_.description));             \
+//      memcpy(the_version_.description, caption, sizeof(the_version_.description); \
+//    }                                                                             \
+//    return the_version_;                                                          \
+//  }
 
 DBJ_COMPONENT_VERSION_IMPLEMENTATION(0, 1, 0, DBJ_DLL_CAPTION);
 
 DBJ_COMPONENT_UNLOADER_IMPLEMENTATION();
-/* ---------------------------------------------------------------------------------
- */
-//  private instance of the interface implementation
-/* ---------------------------------------------------------------------------------
+/* 
+---------------------------------------------------------------------------------
+  private instance of the interface implementation
  */
 static dbjsyslog_client implementation_ = {
     // here connect function pointers of the public interface
@@ -47,8 +47,8 @@ static dbjsyslog_client implementation_ = {
     // eof interface
 };
 
-// each dbj dll aka "component"
+// each dbj dll "component"
 // must have exported factory function
-// with the predefined name "interface_factory"
+// with the predefined name "dbj_dll_interface_factory"
 // hint: see the def file in this folder
-dbjsyslog_client *interface_factory(void) { return &implementation_; }
+dbjsyslog_client *dbj_dll_interface_factory(void) { return &implementation_; }

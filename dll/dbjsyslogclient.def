@@ -1,4 +1,4 @@
 EXPORTS
-dbj_component_can_unload_now    PRIVATE
-interface_factory               PRIVATE
-dbj_component_version           PRIVATE
+dbj_dll_component_can_unload_now    PRIVATE
+dbj_dll_interface_factory               PRIVATE
+dbj_dll_component_version           PRIVATE

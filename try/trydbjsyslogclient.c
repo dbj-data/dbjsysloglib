@@ -2,8 +2,9 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-#include "../dll/dbjsyslogclient.h"
-#include "../dll/dbj-dlluser.h"
+#include "../dll/dbjsyslogclient.h" // component interface declaration
+
+#include <dbj-dll/dbj-dlluser.h>
 
 //
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -48,41 +49,5 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   iface_->info("%s", "Info!");
   iface_->debug("%s", "Debug!");
 
-  // NOTE! at_exit is called by using crt atexit function deep inside this
-  // syslog implementation; probably not a good idea
-  // using clang constructor/destructor functions this might be done 
-  // better as it will be controled by the user code.
-  // above is a bit pedestrian process
-  // client init code migt very likely be put in one function; perhaps
-  /*
-      // call this from a constructor function
-       static inline dbjsyslog_client* dbjsyslog (void) 
-       {
-       static dbjsyslog_client* iface_ = 0;
-       if (! iface_ ) {
-         dbjsyslog_client_ifp dll_factory_ =
-         (dbjsyslog_client_ifp)dbj_dll_get_factory_function(&dll_hinst_, DBJCS_INTEFACE_FACTORY_STR);
-          assert(dll_factory_); 
-          if (dll_factory_) {
-          iface_ = dll_factory_();
-          assert(iface_);
-          }
-         }
-          return iface_ ;
-       }
-
-       __attribute__((constructor))
-       void dbjsyslog_construct(void)
-       {
-          (void)dbjsyslog() ; // 
-       }
-
-       __attribute__((destructor))
-       void dbjsyslog_destruct(void)
-       {
-          dbj_syslog_on_exit() ; // not there yet
-       }
-  */
-
-  return 42;
+    return 42;
 }

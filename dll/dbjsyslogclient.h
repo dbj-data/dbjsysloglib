@@ -3,12 +3,13 @@
 #error Obviously, this code requires clang compiler
 #endif
 /*
- * this is the public DBJ DLL header containing the
+ * This is the example of an DBJ DLL Component header containing the
  * declaration of the interface struct, dll name
  * and fp type of the factory function returning
  * the pointer to the interface implementation
- * 
- * Remember this dll is built using a def file
+ *
+ * Remember this dll is built using a def file that must be present.
+ * best just copied from the dbj-dll, and renamed.
  */
 
 #pragma clang system_header
@@ -23,10 +24,11 @@ extern "C" {
 // used mainly for sem ver struct
 #ifdef _DEBUG
 #define DBJ_DLL_CAPTION "dbj syslog client DEBUG build"
-#else // RELEASE
+#else  // RELEASE
 #define DBJ_DLL_CAPTION "dbj syslog client release build"
 #endif
 
+// ------------------------------------------------------------
 // the interface declaration
 // each ans every user function is to be obtained through the pointer to this
 // strict
@@ -81,9 +83,9 @@ typedef dbjsyslog_client* (*dbjsyslog_client_ifp)(void);
 
 //
 // interface factory function for this component is implemented
-// inside the DLL, but name is pre-defined in the def file:
+// inside this DLL, but the name is pre-defined in the def file:
 //
-// struct dbjsyslog_client_ *interface_factory(void);
+// struct dbjsyslog_client_ *dbj_dll_interface_factory(void);
 //
 #ifdef _cplusplus
 }
