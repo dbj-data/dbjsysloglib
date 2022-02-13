@@ -162,6 +162,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="mt_driver.c" />
     <ClCompile Include="trydbjsyslogclient.c" />
   </ItemGroup>
   <ItemGroup>

@@ -6,7 +6,8 @@
 
 #include <dbj-dll/dbj-dlluser.h>
 
-//
+extern int multi_threading_driver_(dbjsyslog_client* syslog_);
+    //
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                       _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine,
                       _In_ int nCmdShow) {
@@ -41,19 +42,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   dbjsyslog_client* iface_ = dll_factory_();
   assert(iface_);
 
-  // 3. call the methods available
-  iface_->dbj_syslog_initalize(0, 0);
-
-  iface_->emergency("%s", "Emergency!");
-  iface_->alert("%s", "Alert!");
-  iface_->critical("%s", "Critical!");
-  iface_->error("%s", "Error!");
-  iface_->warning("%s", "Warning!");
+  // will use the localhost syslog server with the default identity
+  // of this component base name with PID added
+  iface_->dbj_syslog_initalize(0, "dbjsyslog MT testing");
   iface_->info("Using dbj syslog: %s", dbj_syslog_VERSION );
-  iface_->debug("%s", "Debug!");
+
+  multi_threading_driver_(iface_); // proceed with the multi_threading_driver_
+
+  // 3. call the methods available
+  //iface_->dbj_syslog_initalize(0, 0);
+  //iface_->emergency("%s", "Emergency!");
+  //iface_->alert("%s", "Alert!");
+  //iface_->critical("%s", "Critical!");
+  //iface_->error("%s", "Error!");
+  //iface_->warning("%s", "Warning!");
+  //iface_->info("Using dbj syslog: %s", dbj_syslog_VERSION );
+  //iface_->debug("%s", "Debug!");
 
   // that is obviously pedestrian way of using it
   // users will probably use one or more macros in reality
+
+  // remember syslog already posts this executable basename and PID with each message
+  iface_->info("%s", "Leaving wWinMain()");
 
     return 42;
 }

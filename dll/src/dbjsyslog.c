@@ -129,7 +129,7 @@ void dbj_syslog_initalize(const char* ip_and_port, const char* id) {
 }
 
 // hidden:
-extern void vsyslog(int /*__pri*/, const char* /* __fmt */, va_list);
+ void vsyslog(int /*__pri*/, const char* /* __fmt */, va_list);
 
 static void syslog_call(int level_, const char* format_, va_list ap) {
   if (!is_syslog_initialized()) {
@@ -142,7 +142,7 @@ to uninitialize means to call closelog() and do some othe cleanup
 exit_syslog() does that on exit so no need for users to do anything
 */
 
-extern void syslog_emergency(const char* format_, ...) {
+ void syslog_emergency(const char* format_, ...) {
   DBJ_LOCK;
   va_list ap;
   va_start(ap, format_);
@@ -150,7 +150,7 @@ extern void syslog_emergency(const char* format_, ...) {
   va_end(ap);
   DBJ_UNLOCK;
 }
-extern void syslog_alert(const char* format_, ...) {
+ void syslog_alert(const char* format_, ...) {
   DBJ_LOCK;
   va_list ap;
   va_start(ap, format_);
@@ -158,7 +158,7 @@ extern void syslog_alert(const char* format_, ...) {
   va_end(ap);
   DBJ_UNLOCK;
 }
-extern void syslog_critical(const char* format_, ...) {
+ void syslog_critical(const char* format_, ...) {
   DBJ_LOCK;
   va_list ap;
   va_start(ap, format_);
@@ -166,7 +166,7 @@ extern void syslog_critical(const char* format_, ...) {
   va_end(ap);
   DBJ_UNLOCK;
 }
-extern void syslog_error(const char* format_, ...) {
+ void syslog_error(const char* format_, ...) {
   DBJ_LOCK;
   va_list ap;
   va_start(ap, format_);
@@ -174,7 +174,7 @@ extern void syslog_error(const char* format_, ...) {
   va_end(ap);
   DBJ_UNLOCK;
 }
-extern void syslog_warning(const char* format_, ...) {
+ void syslog_warning(const char* format_, ...) {
   DBJ_LOCK;
   va_list ap;
   va_start(ap, format_);
@@ -182,7 +182,7 @@ extern void syslog_warning(const char* format_, ...) {
   va_end(ap);
   DBJ_UNLOCK;
 }
-extern void syslog_notice(const char* format_, ...) {
+ void syslog_notice(const char* format_, ...) {
   DBJ_LOCK;
   va_list ap;
   va_start(ap, format_);
@@ -190,7 +190,7 @@ extern void syslog_notice(const char* format_, ...) {
   va_end(ap);
   DBJ_UNLOCK;
 }
-extern void syslog_info(const char* format_, ...) {
+ void syslog_info(const char* format_, ...) {
   DBJ_LOCK;
   va_list ap;
   va_start(ap, format_);
@@ -198,7 +198,7 @@ extern void syslog_info(const char* format_, ...) {
   va_end(ap);
   DBJ_UNLOCK;
 }
-extern void syslog_debug(const char* format_, ...) {
+ void syslog_debug(const char* format_, ...) {
   DBJ_LOCK;
   va_list ap;
   va_start(ap, format_);
