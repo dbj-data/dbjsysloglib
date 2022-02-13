@@ -1,4 +1,7 @@
 // Copyright 2022 by dbj@dbj.org
+/*
+20220213    DBJ     made 0.2.0
+*/
 #ifndef DBJ_SYSLOG_WALL_OF_MACROS_
 #define DBJ_SYSLOG_WALL_OF_MACROS_
 
@@ -6,7 +9,7 @@
 #include <stddef.h>
 
 #define dbj_syslog_MAJOR  0
-#define dbj_syslog_MINOR  1
+#define dbj_syslog_MINOR  2
 #define dbj_syslog_PATCH  0
 
 #define  dbj_syslog_VERSION  dbj_syslog_STRINGIFY(dbj_syslog_MAJOR) "." dbj_syslog_STRINGIFY(dbj_syslog_MINOR) "." dbj_syslog_STRINGIFY(dbj_syslog_PATCH)

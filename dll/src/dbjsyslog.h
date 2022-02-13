@@ -17,12 +17,6 @@ namespace dbj::syslog {
  "C" {
 #endif
 
-	// SEMantic VERsioning
-	// typedef enum version {
-	//  MAJOR = 1,
-	//  MINOR = 0,
-	//  PATCH = 0,
-	// } version;
 	// must iniialize before first use
 	// WARNING! if not initialized dbjsysloglob will simply exit
 	 int is_syslog_initialized();

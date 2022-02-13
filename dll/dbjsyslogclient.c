@@ -5,24 +5,10 @@
 basically in here we connect interface implementation with actual implementation
 */
 
-#include "dbjsyslogclient.h" // public component header for users
-#include "src/dbjsyslog.h"  // the implementation
+#include "dbjsyslogclient.h" // public component header for users to use
+#include "src/dbjsyslog.h"  // the implementation is hidden
 
-#include <dbj-dll/dbj-dllimp.h>
-
-
-// max len is 0xFF - 1
-// #define DBJ_DLL_CAPTION "dbj syslog client"
-
-//#define DBJ_COMPONENT_VERSION_IMPLEMENTATION_(MA_, MI_, PA_, S_)                  \
-//  struct dbj_component_version_ dbj_component_version_(void) {                    \
-//    static struct dbj_component_version_ the_version_ = {MA_, MI_, PA_, {0}};     \
-//    if (0 == &the_version_.description[0]) {                                      \
-//      static_assert(caption_size < sizeof(the_version_.description));             \
-//      memcpy(the_version_.description, caption, sizeof(the_version_.description); \
-//    }                                                                             \
-//    return the_version_;                                                          \
-//  }
+#include <dbj-dll/dbj-dllimp.h> // for developers implementing the dbj dll components
 
 DBJ_COMPONENT_VERSION_IMPLEMENTATION(0, 1, 0, DBJ_DLL_CAPTION);
 
@@ -48,7 +34,8 @@ static dbjsyslog_client implementation_ = {
 };
 
 // each dbj dll "component"
-// must have exported factory function
+// must have exported "factory function"
 // with the predefined name "dbj_dll_interface_factory"
 // hint: see the def file in this folder
+// that function return single interface implementation, as a pointer
 dbjsyslog_client *dbj_dll_interface_factory(void) { return &implementation_; }

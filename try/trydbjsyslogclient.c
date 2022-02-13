@@ -15,11 +15,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   UNREFERENCED_PARAMETER(lpCmdLine);
   UNREFERENCED_PARAMETER(nCmdShow);
 
-
+ // this is standard dbj dll component usage
+ // dll is dynamicaly loaded
   HINSTANCE dll_hinst_ = dbj_dll_load(DBJSYSLOGCLIENT_DLL_NAME);
 
-  // first report on the dbj dll used
   if (dll_hinst_)
+  // report on the dll used is optional
     dbj_dll_version_report(dll_hinst_, sizeof(DBJSYSLOGCLIENT_DLL_NAME),
                              DBJSYSLOGCLIENT_DLL_NAME);
   else
@@ -28,16 +29,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   // NOTE: errors are already reported; if any
   // NOTE: in debug builds one can see them in the debugger
 
-  // now onto the normal usage
+  // onto the normal usage
+
   // 1. obtain the factory function
   dbjsyslog_client_ifp dll_factory_ =
       (dbjsyslog_client_ifp)dbj_dll_get_factory_function(&dll_hinst_,
                                                  DBJCS_INTEFACE_FACTORY_STR);
-
   assert(dll_factory_);
+  
   // 2. call the factory function to obtain interface
   dbjsyslog_client* iface_ = dll_factory_();
   assert(iface_);
+
   // 3. call the methods available
   iface_->dbj_syslog_initalize(0, 0);
 
@@ -46,8 +49,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   iface_->critical("%s", "Critical!");
   iface_->error("%s", "Error!");
   iface_->warning("%s", "Warning!");
-  iface_->info("%s", "Info!");
+  iface_->info("Using dbj syslog: %s", dbj_syslog_VERSION );
   iface_->debug("%s", "Debug!");
+
+  // that is obviously pedestrian way of using it
+  // users will probably use one or more macros in reality
 
     return 42;
 }

@@ -167,11 +167,12 @@ extern int setlogmask(int __mask);
 /* Generate a log message using FMT string and option arguments.  */
 extern void syslog(int __pri, const char *__fmt, ...);
 
-extern void vsyslog(int /*__pri*/, const char * /* __fmt */, va_list);
+// hidden: extern void vsyslog(int /*__pri*/, const char * /* __fmt */, va_list);
 
 /*
    init_syslog() *must* be called before calling any of the above
-   functions.  exit_syslog() will be scheduled using atexit().
+   functions.  exit_syslog() will be also called as destructor by clang.
+
    However, it is not an error and is encouraged to call
    exit_syslog() before the application exits.
 
@@ -186,14 +187,16 @@ extern void vsyslog(int /*__pri*/, const char * /* __fmt */, va_list);
    looked up using getservbyname().
 
    On failure, the hostname and port will be set to "localhost"
-   and SYSLOG_PORT respectively.
+   and SYSLOG_PORT respectively. For example:
 
    localhost:514
 
 */
 extern void init_syslog(const char *hostname);
 
-extern void exit_syslog(void);
+// as of today 2022 FEB 13 we hide this one 
+// users can ot reach it any more
+void exit_syslog(void);
 
 #ifdef __cplusplus
 }
