@@ -22,20 +22,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   if (dll_hinst_)
   // report on the dll used is optional
-    dbj_dll_version_report(dll_hinst_, sizeof(DBJSYSLOGCLIENT_DLL_NAME),
-                             DBJSYSLOGCLIENT_DLL_NAME);
+    dbj_dll_version_report(dll_hinst_, DBJSYSLOGCLIENT_DLL_NAME);
   else
     return EXIT_FAILURE;
 
   // NOTE: errors are already reported; if any
   // NOTE: in debug builds one can see them in the debugger
-
-  // onto the normal usage
-
+  // Now onto the component usage
   // 1. obtain the factory function
   dbjsyslog_client_ifp dll_factory_ =
-      (dbjsyslog_client_ifp)dbj_dll_get_factory_function(&dll_hinst_,
-                                                 DBJCS_INTEFACE_FACTORY_STR);
+      (dbjsyslog_client_ifp)dbj_dll_get_factory_function(&dll_hinst_);
   assert(dll_factory_);
   
   // 2. call the factory function to obtain interface
