@@ -1,0 +1,1 @@
+The core syslog client implementation is not MT resilient. That is because it is never meant to be used directly.

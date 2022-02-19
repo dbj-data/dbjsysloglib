@@ -41,6 +41,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+// dbj:: remove non ascii parts from the message part of the datagram
+#define DBJ_SYSLOG_CLEAN_MSG
+
+ // dbj
+// #define SYSLOG_RFC5424
+#define SYSLOG_RFC3164
+
 /* syslog default is 64KB */
 #define SYSLOG_DGRAM_SIZE (1024 * 4)
 /*
@@ -194,7 +202,7 @@ extern void syslog(int __pri, const char *__fmt, ...);
 */
 extern void init_syslog(const char *hostname);
 
-// as of today 2022 FEB 13 we hide this one 
+// as of 2022 FEB 13 we hide this one 
 // users can ot reach it any more
 void exit_syslog(void);
 

@@ -33,7 +33,6 @@
 (c) 2019/2020 by dbj.systems, author: dbj@dbj.org
 
 Public header for using dbjsysloglib from C++.
-Please see the README.MD for base documentation
 
 NOTE: syslog() is UNIX affair, and is blisfully unaware of wchar_t
 */

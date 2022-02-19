@@ -1,9 +1,4 @@
-#ifndef __clang__
-#error Please use clang compiler. clang-cl is part of Visual Studio
-#endif
-#if __STDC_VERSION__  < 201112L
-#error please set the C language minimum to C11
-#endif
+
 /*
         DBJ Changes :
         -- always show the process ID, asked or not
@@ -16,10 +11,21 @@
         dbjsylog[.h|.c]
 
         Thus to make solutions in here simple there is no locking.
-        Locking is implemented in 
+        Locking is implemented in : dbjsylog.c
 
-        dbjsylog.c
+        TODO: use <strsafe.h>
 */
+#ifndef __clang__
+#error Please use clang compiler. clang-cl is part of Visual Studio
+#endif
+#if __STDC_VERSION__ < 201112L
+#error please set the C language minimum to C11
+#endif
+#include <stdint.h>
+#include <stdlib.h>
+
+#include "dbj_time.h"
+
 /*
  * Copyright (c) 2008 Secure Endpoints Inc.
  * All rights reserved.
@@ -52,19 +58,19 @@
  *
  */
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
+#include <assert.h>  // _Static_assert, dbj used, C11
 #include <stdio.h>
 #include <string.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #define SYSLOG_NAMES
-#include <crtdbg.h>
 
 #include "syslog.h"
-#define assert _ASSERTE
 
 // dbj added
-static const char* month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+#if (!defined(SYSLOG_RFC3164)) && (!defined(SYSLOG_RFC5424))
+#error Please define SYSLOG_RFC3164 or SYSLOG_RFC5424
+#endif
 
 static BOOL syslog_opened = FALSE;
 
@@ -87,28 +93,30 @@ static BOOL wsa_initialized = FALSE;
 
 /*
  * ----------------------------------------------------------------------------------
- * public function implemented bellow
+ * public function implementations are bellow
  */
-BOOL is_syslog_initialized() {
-
-  return initialized;
-
-}
+BOOL is_syslog_initialized() { return initialized; }
 
 void init_syslog(const char* hostname) {
-
   WSADATA wsd;
   char* service;
 
   if (initialized) return;
 
   if (WSAStartup(MAKEWORD(2, 2), &wsd)) {
-    fprintf(stderr, "Can't initialize WinSock\n");
-    /* we let the rest of the initialization code go through,
-       although none of the syslog calls would succeed. */
+    // dbj: fail in debug builds
+    assert(FALSE && "Can't initialize WinSock 2.2\n");
+    // dbj: proceed uninitalized in release builds
+    perror("Can't initialize WinSock 2.2\n");
+    /* we do not let the rest of the initialization code go through,
+       thus none of the syslog calls would succeed. */
+    wsa_initialized = FALSE;
+    return;
   } else {
     wsa_initialized = TRUE;
   }
+  // DBJ: this is C11
+  _Static_assert(sizeof(syslog_hostname) > 1, "syslog_hostname is too short");
 
   if (hostname)
     strcpy_s(syslog_hostname, sizeof(syslog_hostname), hostname);
@@ -137,14 +145,13 @@ void init_syslog(const char* hostname) {
 
   initialized = TRUE;
 
-  // atexit(exit_syslog);
-
+  // dbj removed this :atexit(exit_syslog);
+  // see the clang destructor bellow
 }
 
 // as of today 2022 FEB 13 we hide this one here
 // users can  reach it only if they know it exist
 __attribute__((destructor)) void exit_syslog(void) {
-
   if (!initialized) return;
 
   closelog();
@@ -152,7 +159,6 @@ __attribute__((destructor)) void exit_syslog(void) {
   if (wsa_initialized) WSACleanup();
 
   initialized = FALSE;
-
 }
 
 static void init_logger_addr() {
@@ -182,7 +188,6 @@ use_default:
  * Close desriptor used to write to system logger.
  */
 void closelog() {
-
   if (!initialized) return;
 
   if (syslog_opened) {
@@ -190,7 +195,6 @@ void closelog() {
     syslog_socket = INVALID_SOCKET;
     syslog_opened = FALSE;
   }
-
 }
 
 /******************************************************************************
@@ -199,7 +203,6 @@ void closelog() {
  * Open connection to system logger.
  */
 void openlog(const char* ident, int option, int facility) {
-
   BOOL failed = FALSE;
   SOCKADDR_IN sa_local;
   DWORD n;
@@ -270,8 +273,6 @@ done:
     if (syslog_socket != INVALID_SOCKET) closesocket(syslog_socket);
   }
   syslog_opened = !failed;
-
-
 }
 
 /******************************************************************************
@@ -280,7 +281,6 @@ done:
  * Set the log mask level.
  */
 int setlogmask(int mask) {
-
   int ret;
 
   if (!initialized) {
@@ -292,19 +292,16 @@ int setlogmask(int mask) {
   ret = syslog_mask;
   if (mask) syslog_mask = mask;
 
-
-
   return ret;
 }
 
 void vsyslog(int pri, const char* fmt, va_list ap);
-    /******************************************************************************
+/******************************************************************************
  * syslog
  *
  * Generate a log message using FMT string and option arguments.
  */
 void syslog(int pri, const char* fmt, ...) {
-
   if (!initialized) /* dbj added */
   {
     assert(0 && "Warning: dbj syslog not initialized?");
@@ -319,14 +316,12 @@ void syslog(int pri, const char* fmt, ...) {
   va_start(ap, fmt);
   vsyslog(pri, fmt, ap);
   va_end(ap);
-
 }
 
 void syslog_send(int pri, const char* message_);
 
-// not in the header 
+// not in the header
 void vsyslog(int pri, const char* fmt, va_list ap) {
-
   if (!initialized) /* dbj added */
   {
     assert(0 && "ERROR: dbj syslog not initialized?");
@@ -347,17 +342,15 @@ void vsyslog(int pri, const char* fmt, va_list ap) {
   // va_end(ap);
 
   syslog_send(pri, message_);
-
 }
+
 /******************************************************************************
  *
  * Generate a log message using FMT and using arguments pointed to by AP.
  */
 static void syslog_send(int pri, const char* message_) {
-  char datagramm[SYSLOG_DGRAM_SIZE];
-  SYSTEMTIME stm;
-  int len;
-  char* p;
+  char datagramm[SYSLOG_DGRAM_SIZE] = {0};
+  char* p = 0;
 
   if (!initialized) return;
 
@@ -368,22 +361,22 @@ static void syslog_send(int pri, const char* message_) {
 
   if (!(pri & LOG_FACMASK)) pri |= syslog_facility;
 
-  GetLocalTime(&stm);
+#ifdef SYSLOG_RFC3164
+  int len = sprintf_s(datagramm, sizeof(datagramm), "<%d>%s %s %s %s: %s", pri,
+                      dbj_syslog_time_stamp_rfc3164(), local_hostname,
+                      syslog_procid_str, syslog_ident, message_);
+#elif SYSLOG_RFC5424
+  int len = sprintf_s(datagramm, sizeof(datagramm), "<%d>1 %s %s %s %s - %s",
+                      pri, dbj_syslog_time_stamp_rfc5424(), local_hostname,
+                      syslog_procid_str, syslog_ident, message_);
+#else
+#error SYSLOG_RFC3164 or SYSLOG_RFC5424 have to be defined
+#endif
 
-  /* THIS IS https://tools.ietf.org/html/rfc3164 FORMAT */
-  len = sprintf_s(
-      datagramm, sizeof(datagramm), "<%d>%s %2d %02d:%02d:%02d %s %s %s: %s",
-      pri, month[stm.wMonth - 1], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond,
-      local_hostname, syslog_procid_str, syslog_ident, message_);
-  /* RFC5424 format */
-  /*
-          len = sprintf_s(datagramm, sizeof(datagramm),
-                  "<%d>1 %4d-%02d-%02dT%02d-%02d-%02d.03%d %s %s %s :",
-                  pri,
-                  stm.wYear, stm.wMonth, stm.wDay, stm.wHour, stm.wMinute,
-     stm.wSecond, stm.wMilliseconds, local_hostname, syslog_ident,
-     syslog_procid_str);
-  */
+  assert(len > 1);
+
+#ifdef DBJ_SYSLOG_CLEAN_MSG
+
   /* dbj comment: this does clean them all into spaces */
   while ((p = strchr(datagramm, '\n'))) {
     if (p) *p = ' '; /* 0; dbj replaced 0 with space */
@@ -400,6 +393,7 @@ static void syslog_send(int pri, const char* message_) {
   while ((p = strchr(datagramm, '\f'))) {
     if (p) *p = ' '; /* 0; dbj replaced 0 with space */
   }
+#endif  // DBJ_SYSLOG_CLEAN_MSG
 
   sendto(syslog_socket, datagramm, (int)strlen(datagramm), 0,
          (SOCKADDR*)&syslog_hostaddr, sizeof(SOCKADDR_IN));
