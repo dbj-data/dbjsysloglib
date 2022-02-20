@@ -1,3 +1,6 @@
 [submodule "dbj-dll"]
 	path = dbj-dll
 	url = https://github.com/dbj-data/dbj-dll.git
+[submodule "inih"]
+	path = inih
+	url = https://github.com/dbj-data/inih
