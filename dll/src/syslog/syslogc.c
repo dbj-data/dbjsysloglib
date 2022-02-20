@@ -386,6 +386,7 @@ static void syslog_send(int priority_, const char* message_) {
 #endif
 
   assert(len == S_OK);
+  (void)len;
 
 #ifdef DBJ_SYSLOG_CLEAN_MSG
 

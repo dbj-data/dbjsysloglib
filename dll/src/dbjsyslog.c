@@ -89,6 +89,7 @@ static const char* app_base_name() {
   CHAR szFileNameA[MAX_PATH] = {0};
   int rez_ = GetModuleFileNameA(NULL, szFileNameA, MAX_PATH);
   assert(rez_ > 0);
+  (void)rez_;
   return basename(szFileNameA);
   // return basename(dbjwin_command_line_to_utf8_argv(&argc_)[0]);
 }

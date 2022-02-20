@@ -48,6 +48,8 @@ This is simply because there are millions of devices in use (and will be for a l
 
 Licence is [here](LICENSE.md).
 
+For syslog KB we use [RUCKUS](http://docs.ruckuswireless.com/fastiron/08.0.60/fastiron-08060-monitoringguide/GUID-EE6F252D-5230-46C5-9F74-6FE6355849E9.html).
+
 ---------------------------------------------------------------------  
 
 [![dbj();](https://dbj.org/wp-content/uploads/2015/12/cropped-dbj-icon-e1486129719897.jpg)](http://www.dbj.org "dbj")  
