@@ -1,15 +1,17 @@
 // refactored code from
 // https://docs.microsoft.com/en-us/windows/win32/procthread/creating-threads
-// dbj syslog interface
 #include <strsafe.h>
 
+// using dbj syslog interface
 #include "../dll/dbjsyslogclient.h"
-// #include <tchar.h>
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #define MAX_THREADS 0xF
 #define BUF_SIZE BUFSIZ
+
+#define WORKER_LOOP_SIZE 1
 
 DWORD WINAPI thread_worker_function_(LPVOID lpParam);
 void error_handler_(dbjsyslog_client* syslog_, LPCSTR lpszFunction);
@@ -20,11 +22,12 @@ void error_handler_(dbjsyslog_client* syslog_, LPCSTR lpszFunction);
 typedef struct Thread_user_data_type_ {
   int val1;
   int val2;
-  // this is how we pass interface pointer to threads
+  // this is how we pass dbjsyslog interface pointer to threads
   dbjsyslog_client* syslog_;
 } MYDATA, *PMYDATA;
 
-int multi_threading_driver_(dbjsyslog_client* syslog_) {
+int multi_threading_driver_(dbjsyslog_client* syslog_) 
+{
   PMYDATA data_pointers_[MAX_THREADS] = {0};
   DWORD thread_identifiers_[MAX_THREADS] = {0};
   HANDLE thread_handles_[MAX_THREADS] = {0};
@@ -100,43 +103,42 @@ int multi_threading_driver_(dbjsyslog_client* syslog_) {
   syslog_->debug("%s", "multi_threading_driver_, done");
   return TRUE;
 }
-
+/*-----------------------------------------------------------------*/
 static DWORD WINAPI thread_worker_function_(LPVOID lpParam) {
   // HANDLE hStdout = 0;
   PMYDATA data_pointers_ = 0;
 
   CHAR msgBuf[BUF_SIZE] = {0};
   size_t cchStringSize = 0;
-  // DWORD dwChars;
-
-  // Make sure there is a console to receive output results.
-  // BUT not on the server side
-  // hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-  // if (hStdout == INVALID_HANDLE_VALUE) return 1;
 
   // Cast the parameter to the correct data type.
   // The pointer is known to be valid because
   // it was checked for NULL before the thread was created.
-
   data_pointers_ = (PMYDATA)lpParam;
 
   dbjsyslog_client* syslog_ = data_pointers_->syslog_;
 
-  // can not Print the parameter values using thread-safe functions.
-
-  StringCchPrintfA(msgBuf, BUF_SIZE, "Thread [%6d] received parameters = %3d, %3d",
-                   GetCurrentThreadId(), data_pointers_->val1,
-                   data_pointers_->val2);
+  StringCchPrintfA(
+      msgBuf, BUF_SIZE, "Thread [%6d] received parameters = %3d, %3d",
+      GetCurrentThreadId(), data_pointers_->val1, data_pointers_->val2);
   StringCchLengthA(msgBuf, BUF_SIZE, &cchStringSize);
 
-  // there is no console on the server side aka "cloud"
-  // WriteConsole(hStdout, msgBuf, (DWORD)cchStringSize, &dwChars, NULL);
-  // note: dbj syslog functions lock/unlock
-  syslog_->info("%s", msgBuf);
+  // note: dbj syslog functions do lock/unlock
+  for (unsigned k = 0; k < WORKER_LOOP_SIZE; ++k) {
+    syslog_->info("%s", msgBuf);
+    syslog_->emergency("%s", msgBuf);
+    syslog_->alert("%s", msgBuf);
+    syslog_->critical("%s", msgBuf);
+    syslog_->error("%s", msgBuf);
+    syslog_->warning("%s", msgBuf);
+    syslog_->debug("%s", msgBuf);
+    Sleep(1000);
+  }
 
   return 0;
 }
 
+/*-----------------------------------------------------------------*/
 static void error_handler_(dbjsyslog_client* syslog_, LPCSTR lpszFunction) {
   // Retrieve the system error message for the last-error code.
 

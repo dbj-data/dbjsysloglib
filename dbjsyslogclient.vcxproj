@@ -23,6 +23,9 @@
     <ClCompile Include="dll\src\dbjsyslog.c" />
     <ClCompile Include="dll\src\syslog\syslogc.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dll\src\syslog\dbj_strsafe.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

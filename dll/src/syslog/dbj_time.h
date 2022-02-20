@@ -93,7 +93,7 @@ static inline const char* const dbj_syslog_time_stamp_rfc3164(void) {
     perror("sprintf_s has failed\n");
     return 0;
   }
-  // be usre to use it immediately!
+  // be sure to use immediately!
   return time_stamp;
 }
 
@@ -127,7 +127,7 @@ static inline const char * const dbj_syslog_time_stamp_rfc5424(void)
     perror("sprintf_s has failed\n");
     return 0;
   }
-  // be usre to use it immediately!
+  // be sure to use immediately!
   return time_stamp;
 }
 

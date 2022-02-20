@@ -26,6 +26,14 @@
 
 #include "dbj_time.h"
 
+#include "dbj_strsafe.h"
+
+// string.h
+void* memcpy(void* dest, const void* src, size_t count);
+void* memset(void* dest, int ch, size_t count);
+// C11
+errno_t memset_s(void* dest, rsize_t destsz, int ch, rsize_t count);
+
 /*
  * Copyright (c) 2008 Secure Endpoints Inc.
  * All rights reserved.
@@ -58,9 +66,9 @@
  *
  */
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include <assert.h>  // _Static_assert, dbj used, C11
+#include <assert.h>  // dbj: _Static_assert, C11
 #include <stdio.h>
-#include <string.h>
+// dbj: using strsafe.h #include <string.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #define SYSLOG_NAMES
@@ -77,16 +85,17 @@ static BOOL syslog_opened = FALSE;
 static int syslog_mask = 0xFF;
 static char syslog_ident[128] = "";
 static int syslog_facility = LOG_USER;
-static char syslog_procid_str[20];
+static char syslog_procid_str[20] = {0};
 
-static SOCKADDR_IN syslog_hostaddr;
+static SOCKADDR_IN syslog_hostaddr = {0};
 static SOCKET syslog_socket = INVALID_SOCKET;
 static char local_hostname[MAX_COMPUTERNAME_LENGTH + 1];
 
+// dbj todo: ini file reader to be added and used
 static char syslog_hostname[MAX_COMPUTERNAME_LENGTH + 1] = "localhost";
 static unsigned short syslog_port = SYSLOG_PORT;
 
-static int datagramm_size;
+static int datagramm_size = 0;
 
 volatile BOOL initialized = FALSE;
 static BOOL wsa_initialized = FALSE;
@@ -121,7 +130,7 @@ void init_syslog(const char* hostname) {
   if (hostname)
     strcpy_s(syslog_hostname, sizeof(syslog_hostname), hostname);
   else
-    strcpy_s(syslog_hostname, sizeof(syslog_hostname), "");
+    strcpy_s(syslog_hostname, sizeof(syslog_hostname), "Unknown");
 
   service = strchr(syslog_hostname, ':');
 
@@ -204,9 +213,9 @@ void closelog() {
  */
 void openlog(const char* ident, int option, int facility) {
   BOOL failed = FALSE;
-  SOCKADDR_IN sa_local;
-  DWORD n;
-  int size;
+  SOCKADDR_IN sa_local = {0};
+  DWORD n = 0;
+  int size = 0;
 
   /*DBJ added */
   if (!ident) ident = "Anonymous";
@@ -227,7 +236,7 @@ void openlog(const char* ident, int option, int facility) {
   DBJ Changed: always show the process ID, asked or not
   */
   /*if( option & LOG_PID )*/
-  sprintf_s(syslog_procid_str, sizeof(syslog_procid_str), "[pid:%lu]",
+  dbjwin_sprintfa(syslog_procid_str, sizeof(syslog_procid_str), "[pid:%lu]",
             GetCurrentProcessId());
   /*else
       syslog_procid_str[0] = '\0'; */
@@ -362,18 +371,20 @@ static void syslog_send(int pri, const char* message_) {
   if (!(pri & LOG_FACMASK)) pri |= syslog_facility;
 
 #ifdef SYSLOG_RFC3164
-  int len = sprintf_s(datagramm, sizeof(datagramm), "<%d>%s %s %s %s: %s", pri,
+  HRESULT len =
+      dbjwin_sprintfa(datagramm, sizeof(datagramm), "<%d>%s %s %s %s: %s", pri,
                       dbj_syslog_time_stamp_rfc3164(), local_hostname,
                       syslog_procid_str, syslog_ident, message_);
-#elif SYSLOG_RFC5424
-  int len = sprintf_s(datagramm, sizeof(datagramm), "<%d>1 %s %s %s %s - %s",
+#elif defined(SYSLOG_RFC5424)
+  HRESULT len =
+      dbjwin_sprintfa(datagramm, sizeof(datagramm), "<%d>1 %s %s %s %s - %s",
                       pri, dbj_syslog_time_stamp_rfc5424(), local_hostname,
                       syslog_procid_str, syslog_ident, message_);
 #else
 #error SYSLOG_RFC3164 or SYSLOG_RFC5424 have to be defined
 #endif
 
-  assert(len > 1);
+  assert(len == S_OK );
 
 #ifdef DBJ_SYSLOG_CLEAN_MSG
 

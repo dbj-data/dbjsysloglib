@@ -46,8 +46,8 @@ extern "C" {
 #define DBJ_SYSLOG_CLEAN_MSG
 
  // dbj
-// #define SYSLOG_RFC5424
-#define SYSLOG_RFC3164
+#define SYSLOG_RFC5424
+// #define SYSLOG_RFC3164
 
 /* syslog default is 64KB */
 #define SYSLOG_DGRAM_SIZE (1024 * 4)

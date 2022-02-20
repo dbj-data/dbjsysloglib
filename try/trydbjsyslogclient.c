@@ -43,22 +43,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   iface_->dbj_syslog_initalize(0, "dbjsyslog MT testing");
   iface_->info("Using dbj syslog: %s", dbj_syslog_VERSION );
 
-  multi_threading_driver_(iface_); // proceed with the multi_threading_driver_
-
   // 3. call the methods available
-  //iface_->dbj_syslog_initalize(0, 0);
-  //iface_->emergency("%s", "Emergency!");
-  //iface_->alert("%s", "Alert!");
-  //iface_->critical("%s", "Critical!");
-  //iface_->error("%s", "Error!");
-  //iface_->warning("%s", "Warning!");
-  //iface_->info("Using dbj syslog: %s", dbj_syslog_VERSION );
-  //iface_->debug("%s", "Debug!");
+  // from multiple threads
+  multi_threading_driver_(iface_);  // proceed with the multi_threading_driver_
 
-  // that is obviously pedestrian way of using it
-  // users will probably use one or more macros in reality
-
-  // remember syslog already posts this executable basename and PID with each message
+// remember syslog already posts this executable basename and PID with each message
   iface_->info("%s", "Leaving wWinMain()");
 
     return 42;
