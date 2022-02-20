@@ -45,9 +45,11 @@ extern "C" {
 // dbj:: remove non ascii parts from the message part of the datagram
 #define DBJ_SYSLOG_CLEAN_MSG
 
- // dbj
-#define SYSLOG_RFC5424
-// #define SYSLOG_RFC3164
+// dbj
+// rfc5424 is a bitch #define SYSLOG_RFC5424
+// currently we do not support it
+// everything undesrstands RFC3164
+#define SYSLOG_RFC3164
 
 /* syslog default is 64KB */
 #define SYSLOG_DGRAM_SIZE (1024 * 4)
@@ -141,9 +143,10 @@ CODE facilitynames[] = {
 /*
  * arguments to setlogmask.
  */
-#define LOG_MASK(pri) (1 << (pri))             /* mask for one priority */
-#define LOG_UPTO(pri) ((1 << ((pri) + 1)) - 1) /* all priorities through pri \
-                                                */
+#define LOG_MASK(pri) (1 << (pri)) /* mask for one priority */
+#define LOG_UPTO(pri)                                    \
+  ((1 << ((pri) + 1)) - 1) /* all priorities through pri \
+                            */
 
 /*
  * Option flags for openlog.
@@ -175,7 +178,8 @@ extern int setlogmask(int __mask);
 /* Generate a log message using FMT string and option arguments.  */
 extern void syslog(int __pri, const char *__fmt, ...);
 
-// hidden: extern void vsyslog(int /*__pri*/, const char * /* __fmt */, va_list);
+// hidden: extern void vsyslog(int /*__pri*/, const char * /* __fmt */,
+// va_list);
 
 /*
    init_syslog() *must* be called before calling any of the above
@@ -202,7 +206,7 @@ extern void syslog(int __pri, const char *__fmt, ...);
 */
 extern void init_syslog(const char *hostname);
 
-// as of 2022 FEB 13 we hide this one 
+// as of 2022 FEB 13 we hide this one
 // users can ot reach it any more
 void exit_syslog(void);
 

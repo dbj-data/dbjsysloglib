@@ -1,4 +1,4 @@
-
+#define _CRT_SECURE_NO_WARNINGS 1
 /*
         DBJ Changes :
         -- always show the process ID, asked or not
@@ -24,9 +24,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "dbj_time.h"
-
 #include "dbj_strsafe.h"
+#include "dbj_time.h"
 
 // string.h
 void* memcpy(void* dest, const void* src, size_t count);
@@ -237,7 +236,7 @@ void openlog(const char* ident, int option, int facility) {
   */
   /*if( option & LOG_PID )*/
   dbjwin_sprintfa(syslog_procid_str, sizeof(syslog_procid_str), "[pid:%lu]",
-            GetCurrentProcessId());
+                  GetCurrentProcessId());
   /*else
       syslog_procid_str[0] = '\0'; */
 
@@ -357,34 +356,36 @@ void vsyslog(int pri, const char* fmt, va_list ap) {
  *
  * Generate a log message using FMT and using arguments pointed to by AP.
  */
-static void syslog_send(int pri, const char* message_) {
+static void syslog_send(int priority_, const char* message_) {
+  assert(message_);
+
   char datagramm[SYSLOG_DGRAM_SIZE] = {0};
   char* p = 0;
 
   if (!initialized) return;
 
-  if (!(LOG_MASK(LOG_PRI(pri)) & syslog_mask)) goto done;
+  if (!(LOG_MASK(LOG_PRI(priority_)) & syslog_mask)) goto done;
 
-  openlog(NULL, 0, pri & LOG_FACMASK);
+  openlog(NULL, 0, priority_ & LOG_FACMASK);
   if (!syslog_opened) goto done;
 
-  if (!(pri & LOG_FACMASK)) pri |= syslog_facility;
+  if (!(priority_ & LOG_FACMASK)) priority_ |= syslog_facility;
 
 #ifdef SYSLOG_RFC3164
-  HRESULT len =
-      dbjwin_sprintfa(datagramm, sizeof(datagramm), "<%d>%s %s %s %s: %s", pri,
-                      dbj_syslog_time_stamp_rfc3164(), local_hostname,
-                      syslog_procid_str, syslog_ident, message_);
+  // NOTE: time stamp format is IMPORTANT!
+  HRESULT len = dbjwin_sprintfa(
+      datagramm, sizeof(datagramm), "<%d>%s %s %s %s: %s", priority_,
+      dbj_syslog_time_stamp_rfc3164() , local_hostname,
+      syslog_procid_str, syslog_ident, message_);
 #elif defined(SYSLOG_RFC5424)
-  HRESULT len =
-      dbjwin_sprintfa(datagramm, sizeof(datagramm), "<%d>1 %s %s %s %s - %s",
-                      pri, dbj_syslog_time_stamp_rfc5424(), local_hostname,
-                      syslog_procid_str, syslog_ident, message_);
+  HRESULT len = dbjwin_sprintfa(
+      datagramm, sizeof(datagramm), "<%d>1 %s %s %s %s - - %s", priority_,
+      dbj_rfc3399(), local_hostname, syslog_procid_str, syslog_ident, message_);
 #else
 #error SYSLOG_RFC3164 or SYSLOG_RFC5424 have to be defined
 #endif
 
-  assert(len == S_OK );
+  assert(len == S_OK);
 
 #ifdef DBJ_SYSLOG_CLEAN_MSG
 

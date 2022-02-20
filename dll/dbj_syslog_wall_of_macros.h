@@ -8,8 +8,8 @@
 #include <ctype.h>
 #include <stddef.h>
 
-#define dbj_syslog_MAJOR  0
-#define dbj_syslog_MINOR  9
+#define dbj_syslog_MAJOR  1
+#define dbj_syslog_MINOR  0
 #define dbj_syslog_PATCH  0
 
 #define  dbj_syslog_VERSION  dbj_syslog_STRINGIFY(dbj_syslog_MAJOR) "." dbj_syslog_STRINGIFY(dbj_syslog_MINOR) "." dbj_syslog_STRINGIFY(dbj_syslog_PATCH)
