@@ -17,8 +17,6 @@ There are many Windows Syslog servers with associated GUI app.
 
 For our Windows server side deliverables we use "[SysLog Watcher](https://syslogwatcher.com/)".
 
-(For another good and mature syslog server please check: https://www.paessler.com/free_syslog_server )
-
 The project we started from is Copyright (c) 2008 Secure Endpoints Inc.
 
 
