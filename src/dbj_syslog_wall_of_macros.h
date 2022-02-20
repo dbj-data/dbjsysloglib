@@ -9,22 +9,10 @@
 #include <stddef.h>
 
 #define dbj_syslog_MAJOR  1
-#define dbj_syslog_MINOR  0
+#define dbj_syslog_MINOR  2
 #define dbj_syslog_PATCH  0
 
 #define  dbj_syslog_VERSION  dbj_syslog_STRINGIFY(dbj_syslog_MAJOR) "." dbj_syslog_STRINGIFY(dbj_syslog_MINOR) "." dbj_syslog_STRINGIFY(dbj_syslog_PATCH)
-
-#if 0
-#ifdef    dbj_syslog_FEATURE_RTTI
-# define  dbj_syslog__cpp_rtti  dbj_syslog_FEATURE_RTTI
-#elif defined(__cpp_rtti)
-# define  dbj_syslog__cpp_rtti  __cpp_rtti
-#elif defined(__GXX_RTTI) || defined (_CPPRTTI)
-# define  dbj_syslog__cpp_rtti  1
-#else
-# define  dbj_syslog__cpp_rtti  0
-#endif
-#endif // 0
 
 // Stringify:
 
