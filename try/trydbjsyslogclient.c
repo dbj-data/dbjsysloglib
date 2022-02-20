@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <dbj-dll/dbj-dlluser.h>
 
-#include "../dll/dbjsyslogclient.h"  // component interface declaration
+#include "../src/dbjsyslogclient.h"  // component interface declaration
 
 #define DBJSYSLOG_MT_TESTING
 

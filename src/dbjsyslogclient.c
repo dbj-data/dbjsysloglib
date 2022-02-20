@@ -6,7 +6,7 @@ basically in here we connect interface implementation with actual implementation
 */
 
 #include "dbjsyslogclient.h" // public component header for users to use
-#include "src/dbjsyslog.h"  // the implementation is hidden
+#include "core/dbjsyslog.h"  // the implementation is hidden
 
 #include <dbj-dll/dbj-dllimp.h> // for developers implementing the dbj dll components
 

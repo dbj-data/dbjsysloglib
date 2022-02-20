@@ -3,7 +3,7 @@
 #include <strsafe.h>
 
 // using dbj syslog interface
-#include "../dll/dbjsyslogclient.h"
+#include "../src/dbjsyslogclient.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>

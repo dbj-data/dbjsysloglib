@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dll\dbjsyslogclient.c" />
-    <ClCompile Include="dll\src\dbjsyslog.c" />
-    <ClCompile Include="dll\src\syslog\syslogc.c" />
+    <ClCompile Include="src\core\dbjsyslog.c" />
+    <ClCompile Include="src\core\syslog\syslogc.c" />
+    <ClCompile Include="src\dbjsyslogclient.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dll\src\syslog\dbj_strsafe.h" />
@@ -120,7 +120,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(ProjectDir)dll\dbjsyslogclient.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>$(ProjectDir)src\dbjsyslogclient.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -142,7 +142,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(ProjectDir)dll\dbjsyslogclient.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>$(ProjectDir)src\dbjsyslogclient.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -160,7 +160,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(ProjectDir)dll\dbjsyslogclient.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>$(ProjectDir)src\dbjsyslogclient.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -182,7 +182,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(ProjectDir)dll\dbjsyslogclient.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>$(ProjectDir)src\dbjsyslogclient.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
