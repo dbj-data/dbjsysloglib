@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.go": "go",
+        "*.hta": "html",
+        "dbj_strsafe.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}

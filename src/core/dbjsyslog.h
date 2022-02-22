@@ -16,6 +16,26 @@ https://github.com/MicrosoftDocs/cpp-docs/issues/376
 namespace dbj::syslog {
  "C" {
 #endif
+   /*
+;;
+;; (c) 2022 by dbj at dbj dot org
+;;
+;; syslog defaults
+url = localhost
+port = 514
+;; reserved unused
+;; udp or tcp
+protocol = udp
+;; in bytes
+datagramsize=2048
+*/
+#define INI_FILE_NAME ".\\dbjsyslogclient.ini"
+
+	 // config is coming from da ini file
+   typedef struct configuration_ {
+     char url[0xFF];
+     int port;
+   } configuration;
 
 	// must iniialize before first use
 	// WARNING! if not initialized dbjsysloglob will simply exit
@@ -29,8 +49,11 @@ namespace dbj::syslog {
 	   option is ignored, LOG_ODELAY is always used
 	   see the option flags for opening in syslog.h 
 	   for details
+
+	   since version 2.0.0 ip and port are coming from da ini file
+	   or are default to localhost:514
 	*/
-	 void   dbj_syslog_initalize( const char * /* hostname */, const char * /* id */);
+	 void   dbj_syslog_initalize( const char * /* id */);
 
 	/*
 	to uninitialize means to call closelog() and do some othe cleanup

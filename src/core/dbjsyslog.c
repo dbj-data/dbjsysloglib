@@ -4,14 +4,17 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include <string.h>
+// using dbj_strsafe instead #include <string.h> 
 
 #include "syslog/syslog.h"
+#include "dbj-win/dbj_strsafe.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <crtdbg.h>
 #include <shellapi.h>
+
+extern configuration dbjsyslog_config_read(int argc, char* argv[]);
 
 /*
  * safe and slow-er: lock on each entry, unlock on each leave
@@ -106,7 +109,7 @@ static const char* app_base_name() {
    for details
 */
 
-void dbj_syslog_initalize(const char* ip_and_port, const char* id) {
+void dbj_syslog_initalize(const char* id) {
   DBJ_LOCK;
   /*
   * syslog client is one per process, not one per thread
@@ -114,7 +117,18 @@ void dbj_syslog_initalize(const char* ip_and_port, const char* id) {
   if (is_syslog_initialized()) {
     goto done;
   }
+  // read from ini file ... or fail miserably
+  configuration config_ = dbjsyslog_config_read(0,(char**)0);
+
+  char ip_and_port[0xFF] = {0};
+
+  HRESULT hr_ = dbjwin_sprintfa(ip_and_port, sizeof(ip_and_port), "%s:%d",
+                                config_.url, config_.port );
+  assert(hr_ == S_OK);
+  (void)hr_;
+
   // if ip_and_port == NULL, localhost is used
+  // here will be passing datagram size coming from da ini file
   init_syslog(ip_and_port);
   // if id == NULL then id = "Anonymous" which is not good?
   // NOTE! Facility is alway LOG_USER, and Option is always LOG_ODELAY
@@ -134,7 +148,7 @@ void dbj_syslog_initalize(const char* ip_and_port, const char* id) {
 
 static void syslog_call(int level_, const char* format_, va_list ap) {
   if (!is_syslog_initialized()) {
-    dbj_syslog_initalize(NULL, NULL);
+    dbj_syslog_initalize(NULL);
   }
   vsyslog(level_, format_, ap);
 }

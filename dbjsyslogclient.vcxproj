@@ -19,12 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="inih\ini.c" />
     <ClCompile Include="src\core\dbjsyslog.c" />
+    <ClCompile Include="src\core\dbjsyslog_config.c" />
     <ClCompile Include="src\core\syslog\syslogc.c" />
     <ClCompile Include="src\dbjsyslogclient.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dbj-win\dbj-win.h" />
     <ClInclude Include="dll\src\syslog\dbj_strsafe.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dbj-win\readme.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

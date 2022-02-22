@@ -24,8 +24,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "dbj_strsafe.h"
-#include "dbj_time.h"
+#include "dbj-win/dbj_strsafe.h"
+#include "dbj-win/dbj_time.h"
 
 // string.h
 void* memcpy(void* dest, const void* src, size_t count);
