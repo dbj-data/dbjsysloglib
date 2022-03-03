@@ -5,7 +5,7 @@
 
 #include "../src/dbjsyslogclient.h"  // component interface declaration
 
-#define DBJSYSLOG_MT_TESTING
+// #define DBJSYSLOG_MT_TESTING
 
 #ifdef DBJSYSLOG_MT_TESTING
 extern int multi_threading_driver_(dbjsyslog_client* syslog_);
@@ -54,7 +54,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   // remember syslog already posts this executable basename and PID with each
   // message
-  iface_->info("%s", "Leaving wWinMain()");
+  iface_->info("Leaving %s", __FUNCDNAME__);
 
   return 42;
 }

@@ -29,7 +29,7 @@ protocol = udp
 ;; in bytes
 datagramsize=2048
 */
-#define INI_FILE_NAME ".\\dbjsyslogclient.ini"
+#define INI_FILE_NAME "dbjsyslogclient.ini"
 
 	 // config is coming from da ini file
    typedef struct configuration_ {

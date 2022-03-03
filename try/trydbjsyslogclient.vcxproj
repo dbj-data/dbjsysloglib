@@ -165,11 +165,6 @@
     <ClCompile Include="mt_driver.c" />
     <ClCompile Include="trydbjsyslogclient.c" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\dbjsyslogclient.vcxproj">
-      <Project>{48a40859-0788-496b-9593-b7365da5ea48}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
