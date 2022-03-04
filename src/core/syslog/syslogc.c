@@ -24,6 +24,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// https://docs.microsoft.com/en-gb/windows/win32/winsock/windows-sockets-error-codes-2?redirectedfrom=MSDN
+#ifndef WSAEACCESS
+#define WSAEACCESS 10013
+#endif // WSAEACCESS
+
 #include "dbj-win/dbj_strsafe.h"
 #include "dbj-win/dbj_time.h"
 
@@ -329,7 +334,11 @@ void syslog(int pri, const char* fmt, ...) {
 void syslog_send(int pri, const char* message_);
 
 // not in the header
+// va_start(ap, fmt);
+// va_end(ap);
+// make sure that is done in the caller
 void vsyslog(int pri, const char* fmt, va_list ap) {
+
   if (!initialized) /* dbj added */
   {
     assert(0 && "ERROR: dbj syslog not initialized?");
@@ -339,15 +348,11 @@ void vsyslog(int pri, const char* fmt, va_list ap) {
 
   // Caution! the message must be smaller than SYSLOG_DGRAM_SIZE
   char message_[SYSLOG_DGRAM_SIZE] = {0};
-
-  // va_start(ap, fmt);
-  // or -- https://linux.die.net/man/3/vsnprintf
-  if (vsprintf_s(message_, sizeof(message_), fmt, ap) < 0) {
-    assert(0 && "vsprintf_s() failed?\n\n" __FILE__);
-    perror("vsprintf_s() failed?\n\n" __FILE__);
-    exit(1);
+  if ( S_OK != dbjwin_vsprintfa(message_, sizeof(message_), fmt, ap))
+  {
+    assert(0 && __FILE__ ": dbjwin_vsprintfa() failed?" );
+    exit( EXIT_FAILURE );
   }
-  // va_end(ap);
 
   syslog_send(pri, message_);
 }
@@ -357,16 +362,20 @@ void vsyslog(int pri, const char* fmt, va_list ap) {
  * Generate a log message using FMT and using arguments pointed to by AP.
  */
 static void syslog_send(int priority_, const char* message_) {
+
   assert(message_);
 
   char datagramm[SYSLOG_DGRAM_SIZE] = {0};
   char* p = 0;
 
+  assert(initialized);
   if (!initialized) return;
 
   if (!(LOG_MASK(LOG_PRI(priority_)) & syslog_mask)) goto done;
 
   openlog(NULL, 0, priority_ & LOG_FACMASK);
+
+  assert(syslog_opened);
   if (!syslog_opened) goto done;
 
   if (!(priority_ & LOG_FACMASK)) priority_ |= syslog_facility;
@@ -385,8 +394,10 @@ static void syslog_send(int priority_, const char* message_) {
 #error SYSLOG_RFC3164 or SYSLOG_RFC5424 have to be defined
 #endif
 
-  assert(len == S_OK);
-  (void)len;
+  if (len != S_OK) {
+    assert(0 && __FILE__ ": dbjwin_sprintfa() failed");
+    goto done;
+  }
 
 #ifdef DBJ_SYSLOG_CLEAN_MSG
 
@@ -408,8 +419,23 @@ static void syslog_send(int priority_, const char* message_) {
   }
 #endif  // DBJ_SYSLOG_CLEAN_MSG
 
-  sendto(syslog_socket, datagramm, (int)strlen(datagramm), 0,
+  int retcode = sendto(syslog_socket, datagramm, (int)strlen(datagramm), 0,
          (SOCKADDR*)&syslog_hostaddr, sizeof(SOCKADDR_IN));
+
+  if (WSAEACCESS == WSAGetLastError()) {
+    assert(0 && "Winsock permission problem.");
+    closesocket(syslog_socket);
+    WSACleanup();
+    return;
+  }
+
+  if (retcode == SOCKET_ERROR) {
+    assert(0 && __FILE__ ": sendto failed with error  SOCKET_ERROR ");
+    closesocket(syslog_socket);
+    WSACleanup();
+    return;
+  }
+
 done:
   __noop;
 }
