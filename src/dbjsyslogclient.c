@@ -10,18 +10,21 @@ basically in here we connect interface implementation with actual implementation
 
 #include <dbj-dll/dbj-dllimp.h> // for developers implementing the dbj dll components
 
-DBJ_COMPONENT_VERSION_IMPLEMENTATION(0, 1, 0, DBJ_DLL_CAPTION);
+DBJ_COMPONENT_VERSION_IMPLEMENTATION(dbj_syslog_MAJOR, dbj_syslog_MINOR,
+                                     dbj_syslog_PATCH,
+                                     DBJ_DLL_CAPTION);
 
 DBJ_COMPONENT_UNLOADER_IMPLEMENTATION();
 /* 
 ---------------------------------------------------------------------------------
   private instance of the interface implementation
+  be sure to take care of -Wincompatible-function-pointer-types !
  */
 static dbjsyslog_client implementation_ = {
     // here connect function pointers of the public interface
     // to the implementations
     .is_syslog_initialized = is_syslog_initialized,
-    .dbj_syslog_initalize = dbj_syslog_initalize,
+    .initalize = dbj_syslog_initalize,
     .emergency = syslog_emergency,
     .alert = syslog_alert,
     .critical = syslog_critical,

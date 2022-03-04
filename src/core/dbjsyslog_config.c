@@ -3,6 +3,7 @@
 #include "dbjsyslog.h"
 #include "inih/ini.h"
 
+// ---------------------------------------------------------------------------
 // BEWARE: consume the result immediately!
 static inline LPSTR inifile_full_path(const char inifilename_[static 1]) {
   static char buffy[MAX_PATH] = {0};
@@ -23,15 +24,16 @@ static inline LPSTR inifile_full_path(const char inifilename_[static 1]) {
   return buffy;
 }
 
-/* set defaults here */
-static configuration config_ = {{0}, 514};
+// ---------------------------------------------------------------------------
+static configuration config_ = {{0}, DBJSYSLOG_DFLT_PORT};
 
+// ---------------------------------------------------------------------------
 __attribute__((constructor)) static void set_config_defaults(void) {
-  (void)dbjwin_strncpya(config_.url, 0xFF, "localhost", 0xF);
-  config_.port = 514;
+  (void)dbjwin_strncpya(config_.url, sizeof(config_.url) - 1 , DBJSYSLOG_LOCALHOST, sizeof(config_.url) - 1);
+  config_.port = DBJSYSLOG_DFLT_PORT;
 }
 // ---------------------------------------------------------------------------
-// section name is "" not null if not used in ini file
+// section name is empty string aka ""; not null if not used in ini file
 __inline int ini_section_name_value_handler(void* user, const char* section,
                                             const char* name,
                                             const char* value) {
@@ -59,10 +61,10 @@ __inline int ini_section_name_value_handler(void* user, const char* section,
 }
 
 // ----------------------------------------------------------------------------
-// note: argc,argv are zeroed in here, do not use!
-configuration dbjsyslog_config_read(int argc, char* argv[]) {
+// 
+configuration dbjsyslog_config_read(void) {
   // Returns 0 on success
-  int retval_ = ini_parse(inifile_full_path(INI_FILE_NAME),
+  int retval_ = ini_parse(inifile_full_path(DBJSYSLOG_INI_FILE_NAME),
                           ini_section_name_value_handler, 0);
   // ignore ini usage error, defaults are hard coded, are they not?
   (void)retval_;

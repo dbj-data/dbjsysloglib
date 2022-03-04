@@ -2,6 +2,8 @@
 #ifndef DBJ_SYSLOG_LIB_INC
 #define DBJ_SYSLOG_LIB_INC
 
+#include "../dbjsyslogclient.h"
+
 /*
 (c) 2019/2020/2022 by dbj.systems, author: dbj@dbj.org
 private header for the C code using the dbjsysloglib implementation
@@ -29,7 +31,9 @@ protocol = udp
 ;; in bytes
 datagramsize=2048
 */
-#define INI_FILE_NAME "dbjsyslogclient.ini"
+#define DBJSYSLOG_INI_FILE_NAME "dbjsyslogclient.ini"
+#define DBJSYSLOG_LOCALHOST "localhost"
+#define DBJSYSLOG_DFLT_PORT 514
 
 	 // config is coming from da ini file
    typedef struct configuration_ {
@@ -53,7 +57,7 @@ datagramsize=2048
 	   since version 2.0.0 ip and port are coming from da ini file
 	   or are default to localhost:514
 	*/
-	 void   dbj_syslog_initalize( const char * /* id */);
+         void dbj_syslog_initalize( syslog_client_identity );
 
 	/*
 	to uninitialize means to call closelog() and do some othe cleanup

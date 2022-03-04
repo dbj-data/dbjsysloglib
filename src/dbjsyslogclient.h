@@ -31,6 +31,11 @@ extern "C" {
 #endif
 
 // ------------------------------------------------------------
+// 	   strong type so we do not make a mistake what do we mean
+typedef struct {
+  char* val;
+ } syslog_client_identity;
+// ------------------------------------------------------------
 // the interface declaration
 // each ans every user function is to be obtained through the pointer to this
 // strict
@@ -39,15 +44,11 @@ struct dbjsyslog_client_ {
   // WARNING: if not initialized dbjsysloglob will simply exit
   int (*is_syslog_initialized)(void);
   /*
-
   syslog client must initialize before first use
   we need to do this manually so that we give the identity to the syslog client
-  alternative is using the ini file, nut that is tying the dll to configuration
   i.e. it is not generic
-
   */
-  void (*dbj_syslog_initalize)(const char* /* hostname */,
-                               const char* /* id */);
+  void (*initalize)( syslog_client_identity );
 
   /*
   exit_syslog() is called on exit so no need for users to do anything

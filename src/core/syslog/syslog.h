@@ -1,3 +1,6 @@
+#ifndef _SYS_SYSLOG_H
+#define _SYS_SYSLOG_H
+
 /*
  * Copyright (c) 1982, 1986, 1988, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -29,11 +32,12 @@
  *	@(#)syslog.h	8.1 (Berkeley) 6/2/93
  */
 
-#ifndef _SYS_SYSLOG_H
-#define _SYS_SYSLOG_H 1
+
 
 #if defined(_WIN32) || defined(_WIN64)
 #pragma comment(lib, "ws2_32.lib")
+#else
+#error This is WIN only
 #endif
 
 #include <stdarg.h>
@@ -42,10 +46,10 @@
 extern "C" {
 #endif
 
-// dbj:: remove non ascii parts from the message part of the datagram
+// dbj: remove non ascii parts from the message part of the datagram
 #define DBJ_SYSLOG_CLEAN_MSG
 
-// dbj
+// dbj:
 // rfc5424 is a bitch #define SYSLOG_RFC5424
 // currently we do not support it
 // everything undesrstands RFC3164

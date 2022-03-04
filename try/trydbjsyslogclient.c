@@ -43,7 +43,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   // will use the localhost syslog server with the default identity
   // of this component base name with PID added
-  iface_->dbj_syslog_initalize(0, "dbjsyslog MT testing");
+  iface_->initalize((syslog_client_identity){"dbjsyslog MT testing"});
   iface_->info("Using dbj syslog: %s", dbj_syslog_VERSION);
 
 #ifdef DBJSYSLOG_MT_TESTING
