@@ -87,13 +87,18 @@ static char* basename(const char* full_path) {
 
 /* there must be a quicker and simpler way to do this in Windows? */
 static const char* app_base_name() {
-  //  int argc_ = 0;
-  CHAR szFileNameA[MAX_PATH] = {0};
-  int rez_ = GetModuleFileNameA(NULL, szFileNameA, MAX_PATH);
-  assert(rez_ > 0);
-  (void)rez_;
-  return basename(szFileNameA);
-  // return basename(dbjwin_command_line_to_utf8_argv(&argc_)[0]);
+  //  static pointer to static array
+  static CHAR * basename_ = 0 ;
+
+  if (basename_ == 0) {
+    static CHAR szFileNameA[MAX_PATH] = {0};
+
+    if (GetModuleFileNameA(NULL, szFileNameA, MAX_PATH) > 0) {
+      basename_ = basename(szFileNameA);
+    }
+  }
+  assert(basename_);
+  return basename_;
 }
 
 /* to initialize in this context means

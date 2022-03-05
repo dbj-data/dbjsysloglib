@@ -27,7 +27,7 @@
 // https://docs.microsoft.com/en-gb/windows/win32/winsock/windows-sockets-error-codes-2?redirectedfrom=MSDN
 #ifndef WSAEACCESS
 #define WSAEACCESS 10013
-#endif // WSAEACCESS
+#endif  // WSAEACCESS
 
 #include "dbj-win/dbj_strsafe.h"
 #include "dbj-win/dbj_time.h"
@@ -84,37 +84,46 @@ errno_t memset_s(void* dest, rsize_t destsz, int ch, rsize_t count);
 #error Please define SYSLOG_RFC3164 or SYSLOG_RFC5424
 #endif
 
-static BOOL syslog_opened = FALSE;
-
-static int syslog_mask = 0xFF;
-static char syslog_ident[128] = "";
-static int syslog_facility = LOG_USER;
-static char syslog_procid_str[20] = {0};
-
-static SOCKADDR_IN syslog_hostaddr = {0};
-static SOCKET syslog_socket = INVALID_SOCKET;
-static char local_hostname[MAX_COMPUTERNAME_LENGTH + 1];
-
-// dbj todo: ini file reader to be added and used
-static char syslog_hostname[MAX_COMPUTERNAME_LENGTH + 1] = "localhost";
-static unsigned short syslog_port = SYSLOG_PORT;
-
-static int datagramm_size = 0;
-
-volatile BOOL initialized = FALSE;
-static BOOL wsa_initialized = FALSE;
+static struct {
+  BOOL syslog_opened;
+  int syslog_mask;
+  char syslog_ident[128];
+  int syslog_facility;
+  char syslog_procid_str[20];
+  SOCKADDR_IN syslog_hostaddr;
+  SOCKET syslog_socket;
+  char local_hostname[MAX_COMPUTERNAME_LENGTH + 1];
+  char syslog_hostname[MAX_COMPUTERNAME_LENGTH + 1];
+  unsigned short syslog_port;
+  int datagramm_size;
+  volatile BOOL initialized;
+  BOOL wsa_initialized;
+} GLOB = {.syslog_opened = FALSE,
+          .syslog_mask = 0xFF,
+          .syslog_ident = "",
+          .syslog_facility = LOG_USER,
+          .syslog_procid_str = {0},
+          .syslog_hostaddr = {0},
+          .syslog_socket = INVALID_SOCKET,
+          .local_hostname = {0},
+          .syslog_hostname = "localhost",
+          .syslog_port = SYSLOG_PORT,
+          .datagramm_size = 0,
+          .initialized = FALSE,
+          .wsa_initialized = FALSE
+};
 
 /*
  * ----------------------------------------------------------------------------------
  * public function implementations are bellow
  */
-BOOL is_syslog_initialized() { return initialized; }
+BOOL is_syslog_initialized() { return GLOB.initialized; }
 
 void init_syslog(const char* hostname) {
   WSADATA wsd;
   char* service;
 
-  if (initialized) return;
+  if (GLOB.initialized) return;
 
   if (WSAStartup(MAKEWORD(2, 2), &wsd)) {
     // dbj: fail in debug builds
@@ -123,20 +132,20 @@ void init_syslog(const char* hostname) {
     perror("Can't initialize WinSock 2.2\n");
     /* we do not let the rest of the initialization code go through,
        thus none of the syslog calls would succeed. */
-    wsa_initialized = FALSE;
+    GLOB.wsa_initialized = FALSE;
     return;
   } else {
-    wsa_initialized = TRUE;
+    GLOB.wsa_initialized = TRUE;
   }
   // DBJ: this is C11
-  _Static_assert(sizeof(syslog_hostname) > 1, "syslog_hostname is too short");
+  _Static_assert(sizeof(GLOB.syslog_hostname) > 1, "GLOB.syslog_hostname is too short");
 
   if (hostname)
-    strcpy_s(syslog_hostname, sizeof(syslog_hostname), hostname);
+    strcpy_s(GLOB.syslog_hostname, sizeof(GLOB.syslog_hostname), hostname);
   else
-    strcpy_s(syslog_hostname, sizeof(syslog_hostname), "Unknown");
+    strcpy_s(GLOB.syslog_hostname, sizeof(GLOB.syslog_hostname), "Unknown");
 
-  service = strchr(syslog_hostname, ':');
+  service = strchr(GLOB.syslog_hostname, ':');
 
   if (service) {
     int tp;
@@ -148,15 +157,15 @@ void init_syslog(const char* hostname) {
 
       se = getservbyname(service, "udp");
 
-      syslog_port = (se == NULL) ? SYSLOG_PORT : se->s_port;
+      GLOB.syslog_port = (se == NULL) ? SYSLOG_PORT : se->s_port;
     } else {
-      syslog_port = (unsigned short)tp;
+      GLOB.syslog_port = (unsigned short)tp;
     }
   } else {
-    syslog_port = SYSLOG_PORT;
+    GLOB.syslog_port = SYSLOG_PORT;
   }
 
-  initialized = TRUE;
+  GLOB.initialized = TRUE;
 
   // dbj removed this :atexit(exit_syslog);
   // see the clang destructor bellow
@@ -165,34 +174,34 @@ void init_syslog(const char* hostname) {
 // as of today 2022 FEB 13 we hide this one here
 // users can  reach it only if they know it exist
 __attribute__((destructor)) void exit_syslog(void) {
-  if (!initialized) return;
+  if (!GLOB.initialized) return;
 
   closelog();
 
-  if (wsa_initialized) WSACleanup();
+  if (GLOB.wsa_initialized) WSACleanup();
 
-  initialized = FALSE;
+  GLOB.initialized = FALSE;
 }
 
 static void init_logger_addr() {
   struct hostent* phe = NULL;
 
-  memset(&syslog_hostaddr, 0, sizeof(SOCKADDR_IN));
-  syslog_hostaddr.sin_family = AF_INET;
+  memset(&GLOB.syslog_hostaddr, 0, sizeof(SOCKADDR_IN));
+  GLOB.syslog_hostaddr.sin_family = AF_INET;
 
-  if (syslog_hostname[0] == '\0') goto use_default;
+  if (GLOB.syslog_hostname[0] == '\0') goto use_default;
 
-  phe = gethostbyname(syslog_hostname);
+  phe = gethostbyname(GLOB.syslog_hostname);
   if (!phe) goto use_default;
 
-  memcpy(&syslog_hostaddr.sin_addr.s_addr, phe->h_addr, phe->h_length);
+  memcpy(&GLOB.syslog_hostaddr.sin_addr.s_addr, phe->h_addr, phe->h_length);
 
-  syslog_hostaddr.sin_port = htons(syslog_port);
+  GLOB.syslog_hostaddr.sin_port = htons(GLOB.syslog_port);
   return;
 
 use_default:
-  syslog_hostaddr.sin_addr.S_un.S_addr = htonl(0x7F000001);
-  syslog_hostaddr.sin_port = htons(SYSLOG_PORT);
+  GLOB.syslog_hostaddr.sin_addr.S_un.S_addr = htonl(0x7F000001);
+  GLOB.syslog_hostaddr.sin_port = htons(SYSLOG_PORT);
 }
 
 /******************************************************************************
@@ -201,91 +210,82 @@ use_default:
  * Close desriptor used to write to system logger.
  */
 void closelog() {
-  if (!initialized) return;
+  if (!GLOB.initialized) return;
 
-  if (syslog_opened) {
-    closesocket(syslog_socket);
-    syslog_socket = INVALID_SOCKET;
-    syslog_opened = FALSE;
+  if (GLOB.syslog_opened) {
+    closesocket(GLOB.syslog_socket);
+    GLOB.syslog_socket = INVALID_SOCKET;
+    GLOB.syslog_opened = FALSE;
   }
 }
 
 /******************************************************************************
- * openlog
- *
- * Open connection to system logger.
+ * openlog: Open connection to system logger.
+ * BEWARE: this is called repeatedly thus adjust the logic to that
  */
 void openlog(const char* ident, int option, int facility) {
   BOOL failed = FALSE;
   SOCKADDR_IN sa_local = {0};
-  DWORD n = 0;
   int size = 0;
 
-  /*DBJ added */
-  if (!ident) ident = "Anonymous";
+  assert( GLOB.initialized);
 
-  if (!initialized) {
-    assert(0 && "Warning: dbj syslog not initialized?");
-    perror("Warning: dbj syslog not initialized?");
-    return;
-  }
+  if (!GLOB.syslog_opened) {
 
-  if (syslog_opened) goto done;
+        failed = TRUE;
+    dbjwin_sprintfa(GLOB.syslog_procid_str, sizeof(GLOB.syslog_procid_str),
+                    "[pid:%lu]", GetCurrentProcessId());
 
-  failed = TRUE;
+        DWORD n = sizeof(GLOB.local_hostname);
+    if (!GetComputerNameA(GLOB.local_hostname, &n)) goto done;
 
-  syslog_facility = facility ? facility : LOG_USER;
+    GLOB.syslog_socket = INVALID_SOCKET;
 
-  /*
-  DBJ Changed: always show the process ID, asked or not
-  */
-  /*if( option & LOG_PID )*/
-  dbjwin_sprintfa(syslog_procid_str, sizeof(syslog_procid_str), "[pid:%lu]",
-                  GetCurrentProcessId());
-  /*else
-      syslog_procid_str[0] = '\0'; */
+    init_logger_addr();
 
-  n = sizeof(local_hostname);
-  if (!GetComputerNameA(local_hostname, &n)) goto done;
+    for (n = 0;; n++) {
+      GLOB.syslog_socket = socket(AF_INET, SOCK_DGRAM, 0);
+      if (INVALID_SOCKET == GLOB.syslog_socket) goto done;
 
-  syslog_socket = INVALID_SOCKET;
+      memset(&sa_local, 0, sizeof(SOCKADDR_IN));
+      sa_local.sin_family = AF_INET;
+      if (bind(GLOB.syslog_socket, (SOCKADDR*)&sa_local, sizeof(SOCKADDR_IN)) ==
+          0)
+        break;
+      closesocket(GLOB.syslog_socket);
+      GLOB.syslog_socket = INVALID_SOCKET;
+      if (n == 100) goto done;
+      Sleep(0);
+    }
 
-  init_logger_addr();
+      /* get size of datagramm */
+    size = sizeof(GLOB.datagramm_size);
+    if (getsockopt(GLOB.syslog_socket, SOL_SOCKET, SO_MAX_MSG_SIZE,
+                   (char*)&GLOB.datagramm_size, &size))
+      goto done;
+    if (GLOB.datagramm_size - strlen(GLOB.local_hostname) -
+            (ident ? strlen(ident) : 0) <
+        64)
+      goto done;
+    if (GLOB.datagramm_size > SYSLOG_DGRAM_SIZE)
+      GLOB.datagramm_size = SYSLOG_DGRAM_SIZE;
 
-  for (n = 0;; n++) {
-    syslog_socket = socket(AF_INET, SOCK_DGRAM, 0);
-    if (INVALID_SOCKET == syslog_socket) goto done;
+    if (ident) strcpy_s(GLOB.syslog_ident, sizeof(GLOB.syslog_ident), ident);
 
-    memset(&sa_local, 0, sizeof(SOCKADDR_IN));
-    sa_local.sin_family = AF_INET;
-    if (bind(syslog_socket, (SOCKADDR*)&sa_local, sizeof(SOCKADDR_IN)) == 0)
-      break;
-    closesocket(syslog_socket);
-    syslog_socket = INVALID_SOCKET;
-    if (n == 100) goto done;
-    Sleep(0);
-  }
+    failed = FALSE;
 
-  /* get size of datagramm */
-  size = sizeof(datagramm_size);
-  if (getsockopt(syslog_socket, SOL_SOCKET, SO_MAX_MSG_SIZE,
-                 (char*)&datagramm_size, &size))
-    goto done;
-  if (datagramm_size - strlen(local_hostname) - (ident ? strlen(ident) : 0) <
-      64)
-    goto done;
-  if (datagramm_size > SYSLOG_DGRAM_SIZE) datagramm_size = SYSLOG_DGRAM_SIZE;
+  } // eof not initialized
 
-  if (ident) strcpy_s(syslog_ident, sizeof(syslog_ident), ident);
+  if (GLOB.syslog_opened) goto done;
 
-  syslog_facility = (facility ? facility : LOG_USER);
-  failed = FALSE;
+
+  GLOB.syslog_facility = facility ? facility : LOG_USER;
 
 done:
   if (failed) {
-    if (syslog_socket != INVALID_SOCKET) closesocket(syslog_socket);
+    if (GLOB.syslog_socket != INVALID_SOCKET) closesocket(GLOB.syslog_socket);
   }
-  syslog_opened = !failed;
+  GLOB.syslog_opened = !failed;
 }
 
 /******************************************************************************
@@ -296,14 +296,14 @@ done:
 int setlogmask(int mask) {
   int ret;
 
-  if (!initialized) {
-    assert(0 && "Warning: dbj syslog not initialized?");
-    perror("Warning: dbj syslog not initialized?");
+  if (!GLOB.initialized) {
+    assert(0 && "Warning: dbj syslog not GLOB.initialized?");
+    perror("Warning: dbj syslog not GLOB.initialized?");
     return 0;
   }
 
-  ret = syslog_mask;
-  if (mask) syslog_mask = mask;
+  ret = GLOB.syslog_mask;
+  if (mask) GLOB.syslog_mask = mask;
 
   return ret;
 }
@@ -315,10 +315,10 @@ void vsyslog(int pri, const char* fmt, va_list ap);
  * Generate a log message using FMT string and option arguments.
  */
 void syslog(int pri, const char* fmt, ...) {
-  if (!initialized) /* dbj added */
+  if (!GLOB.initialized) /* dbj added */
   {
-    assert(0 && "Warning: dbj syslog not initialized?");
-    perror("Warning: dbj syslog not initialized?");
+    assert(0 && "Warning: dbj syslog not GLOB.initialized?");
+    perror("Warning: dbj syslog not GLOB.initialized?");
     return;
   }
 
@@ -338,20 +338,18 @@ void syslog_send(int pri, const char* message_);
 // va_end(ap);
 // make sure that is done in the caller
 void vsyslog(int pri, const char* fmt, va_list ap) {
-
-  if (!initialized) /* dbj added */
+  if (!GLOB.initialized) /* dbj added */
   {
-    assert(0 && "ERROR: dbj syslog not initialized?");
-    perror("Warning: dbj syslog not initialized?");
+    assert(0 && "ERROR: dbj syslog not GLOB.initialized?");
+    perror("Warning: dbj syslog not GLOB.initialized?");
     return;
   }
 
   // Caution! the message must be smaller than SYSLOG_DGRAM_SIZE
   char message_[SYSLOG_DGRAM_SIZE] = {0};
-  if ( S_OK != dbjwin_vsprintfa(message_, sizeof(message_), fmt, ap))
-  {
-    assert(0 && __FILE__ ": dbjwin_vsprintfa() failed?" );
-    exit( EXIT_FAILURE );
+  if (S_OK != dbjwin_vsprintfa(message_, sizeof(message_), fmt, ap)) {
+    assert(0 && __FILE__ ": dbjwin_vsprintfa() failed?");
+    exit(EXIT_FAILURE);
   }
 
   syslog_send(pri, message_);
@@ -362,34 +360,34 @@ void vsyslog(int pri, const char* fmt, va_list ap) {
  * Generate a log message using FMT and using arguments pointed to by AP.
  */
 static void syslog_send(int priority_, const char* message_) {
-
   assert(message_);
 
   char datagramm[SYSLOG_DGRAM_SIZE] = {0};
   char* p = 0;
 
-  assert(initialized);
-  if (!initialized) return;
+  assert(GLOB.initialized);
+  if (!GLOB.initialized) return;
 
-  if (!(LOG_MASK(LOG_PRI(priority_)) & syslog_mask)) goto done;
+  if (!(LOG_MASK(LOG_PRI(priority_)) & GLOB.syslog_mask)) goto done;
 
+  // reopen for different priority_ & LOG_FACMASK
   openlog(NULL, 0, priority_ & LOG_FACMASK);
 
-  assert(syslog_opened);
-  if (!syslog_opened) goto done;
+  assert(GLOB.syslog_opened);
+  if (!GLOB.syslog_opened) goto done;
 
-  if (!(priority_ & LOG_FACMASK)) priority_ |= syslog_facility;
+  if (!(priority_ & LOG_FACMASK)) priority_ |= GLOB.syslog_facility;
 
 #ifdef SYSLOG_RFC3164
   // NOTE: time stamp format is IMPORTANT!
-  HRESULT len = dbjwin_sprintfa(
-      datagramm, sizeof(datagramm), "<%d>%s %s %s %s: %s", priority_,
-      dbj_syslog_time_stamp_rfc3164() , local_hostname,
-      syslog_procid_str, syslog_ident, message_);
+  HRESULT len = dbjwin_sprintfa(datagramm, sizeof(datagramm),
+                                "<%d>%s %s %s %s: %s", priority_,
+                                dbj_syslog_time_stamp_rfc3164(), GLOB.local_hostname,
+                                GLOB.syslog_procid_str, GLOB.syslog_ident, message_);
 #elif defined(SYSLOG_RFC5424)
   HRESULT len = dbjwin_sprintfa(
       datagramm, sizeof(datagramm), "<%d>1 %s %s %s %s - - %s", priority_,
-      dbj_rfc3399(), local_hostname, syslog_procid_str, syslog_ident, message_);
+      dbj_rfc3399(), GLOB.local_hostname, GLOB.syslog_procid_str, GLOB.syslog_ident, message_);
 #else
 #error SYSLOG_RFC3164 or SYSLOG_RFC5424 have to be defined
 #endif
@@ -419,19 +417,19 @@ static void syslog_send(int priority_, const char* message_) {
   }
 #endif  // DBJ_SYSLOG_CLEAN_MSG
 
-  int retcode = sendto(syslog_socket, datagramm, (int)strlen(datagramm), 0,
-         (SOCKADDR*)&syslog_hostaddr, sizeof(SOCKADDR_IN));
+  int retcode = sendto(GLOB.syslog_socket, datagramm, (int)strlen(datagramm), 0,
+                       (SOCKADDR*)&GLOB.syslog_hostaddr, sizeof(SOCKADDR_IN));
 
   if (WSAEACCESS == WSAGetLastError()) {
     assert(0 && "Winsock permission problem.");
-    closesocket(syslog_socket);
+    closesocket(GLOB.syslog_socket);
     WSACleanup();
     return;
   }
 
   if (retcode == SOCKET_ERROR) {
     assert(0 && __FILE__ ": sendto failed with error  SOCKET_ERROR ");
-    closesocket(syslog_socket);
+    closesocket(GLOB.syslog_socket);
     WSACleanup();
     return;
   }
