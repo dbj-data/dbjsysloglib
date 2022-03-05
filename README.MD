@@ -1,13 +1,30 @@
 
 # dbjsysloglib 
 
-### The Requirements
+## dbjsyslogclient.ini
+
+is used; if found. If not syslog server in use will be: `udp://localhost:514`
+;; syslog defaults
+url = localhost
+port = 514
+;; WIP and reserved and unused
+;; udp or tcp
+protocol = udp
+;; in bytes
+datagramsize=2048
+```
+
+Obviously that is WIP.
+
+## The Requirements
 
 Currently [RFC3164](https://tools.ietf.org/html/rfc3164) is followed. Plan is to develop a support for the newer one: [RFC5424](https://tools.ietf.org/html/rfc5424).
 
+> Although as it turns out that is more pain then gain? Key feature of rfc5424 is esoteric scheme for structured message payload. For what in XXI century we use JSON. Nothing is stopping you to use rfc3164 with JSON message payloads.
+
 This is a DLL implemented in standard C as [DBJ DLL Component](https://github.com/dbj-data/dbj-dll).
 
-### Usage and the API
+## Usage and the API
 
 Please review the [simple one file example application](https://github.com/dbj-data/dbjsysloglib/blob/master/try/trydbjsyslogclient.c) included.
 
@@ -17,15 +34,15 @@ There are many Windows Syslog servers with associated GUI app.
 
 For our Windows server side deliverables we use "[SysLog Watcher](https://syslogwatcher.com/)".
 
-The project we started from is Copyright (c) 2008 Secure Endpoints Inc.
+The project we started from, long time ago, is &copy; 2008 by [Secure Endpoints Inc.](https://www.secure-endpoints.com/)
 
 
 # What are the actual `dbjsyslog` features?
 
-Please make sure you have read once the RFC's 3164 and [5424](https://tools.ietf.org/html/rfc5424) . (Links are at the top of the doc.)
+Please make sure you have read both the RFC's :3164 and [5424](https://tools.ietf.org/html/rfc5424) . (Links are at the top of the doc.)
 
-The dbjsysloglib behaviour is standard syslog, as described on numerous pages on the web.
-`syslog.h` header in here is 99% standard and you are free to browse through it to understand all the options.
+Although it is a dbj=dll wrap-up, the `dbjsysloglib` behaviour is standard syslog, as described on numerous pages on the web.
+`syslog.h` header in here is 99% standard and you are free to browse through it to understand the internals.
 
 ## Sort-of-a async behaviour and Resilience to Multi Threading
 

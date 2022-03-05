@@ -1,6 +1,7 @@
 #define STRICT 1
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+// from MACHINE_WIDE
 #include <dbj-dll/dbj-dlluser.h>
 
 #include "../src/dbjsyslogclient.h"  // component interface declaration

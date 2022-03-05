@@ -1,7 +1,8 @@
 // inih should be on da path
 #include "dbj-win/dbj_strsafe.h"
 #include "dbjsyslog.h"
-#include "inih/ini.h"
+// coming from MACHINE_WIDE somehere on this machine
+#include <dbj-inih/ini.h>
 
 // ---------------------------------------------------------------------------
 // BEWARE: consume the result immediately!
@@ -70,3 +71,8 @@ configuration dbjsyslog_config_read(void) {
   (void)retval_;
   return config_;
 }
+
+// this ia a dangerous hack
+// that will be in a lib folder here
+// ~/machine_wide/lib
+#include <dbj-inih/ini.c>
