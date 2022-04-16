@@ -2,8 +2,8 @@
 # dbjsysloglib 
 
 ## dbjsyslogclient.ini
-
 is used; if found. If not syslog server in use will be: `udp://localhost:514`
+```
 ;; syslog defaults
 url = localhost
 port = 514
@@ -14,7 +14,7 @@ protocol = udp
 datagramsize=2048
 ```
 
-Obviously that is WIP.
+Obviously that/this is WIP.
 
 ## The Requirements
 
