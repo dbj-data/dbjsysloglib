@@ -1,5 +1,5 @@
 
-This is implementation of a DBJ DLL Component.
+## This is win32 implementation of a syslog client as an [DBJ DLL Component](https://github.com/dbj-data/dbj-dll).
 
 Notes
 
